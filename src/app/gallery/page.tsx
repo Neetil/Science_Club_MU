@@ -58,7 +58,7 @@ const heroImages = [
   },
   {
     id: "hero-5",
-    src: "/images/gallery/IMG_44811.png",
+    src: "/images/gallery/IMG_44811.jpg",
     category: "Events",
     title: "Blood Gone Bad 2.0",
     description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
@@ -253,7 +253,7 @@ const galleryImages = [
   },
   {
     id: 26,
-    src: "/images/gallery/IMG_44811.png",
+    src: "/images/gallery/IMG_44811.jpg",
     category: "Events",
     title: "Blood Gone Bad 2.0",
     description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
