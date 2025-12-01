@@ -9,7 +9,7 @@ const categories = ["All", "Team", "Observations", "Events", "Workshops", "Compe
 const heroImages = [
   {
     id: "hero-1",
-    src: "/images/gallery/IMG_7325.jpg",
+    src: "/images/gallery/IMG_73255.jpg",
     category: "Events",
     title: "Space Talk 2.0",
     description: "An electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, and the mysteries that still leave scientists stunned.",
