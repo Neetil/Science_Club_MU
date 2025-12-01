@@ -18,8 +18,8 @@ globalThis.contactRateLimitStore = rateLimitStore;
 export async function POST(request: NextRequest) {
   try {
     const ip =
-      request.ip ||
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip")?.trim() ||
       "unknown";
 
     const now = Date.now();
