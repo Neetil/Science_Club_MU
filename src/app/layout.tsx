@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { ClientBody } from "./ClientBody";
 
@@ -20,10 +21,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
             <header className="sticky top-0 z-50">
               <nav className="flex h-16 items-center justify-between rounded-2xl backdrop-blur-md supports-[backdrop-filter]:bg-black/40 bg-black/30 border border-white/10 shadow-lg shadow-black/20 px-4 sm:px-6">
-                <a href="/" className="group inline-flex items-baseline gap-2">
-                  <span className="text-lg font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">Physics & Astronomy Club</span>
+                <Link href="/" className="group inline-flex items-baseline gap-2">
+                  <span className="text-lg font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">
+                    Physics & Astronomy Club
+                  </span>
                   <span className="hidden sm:inline text-xs text-zinc-400">Medicaps University</span>
-                </a>
+                </Link>
                 <ul className="flex items-center gap-4 text-sm">
                   {[
                     ["Home", "/"],
@@ -34,13 +37,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     ["Contact", "/contact"],
                   ].map(([label, href]) => (
                     <li key={href as string}>
-                      <a
+                      <Link
                         href={href as string}
                         className="relative rounded px-3 py-2 text-zinc-300 hover:text-white transition-colors"
                       >
                         {label}
                         <span className="absolute inset-x-2 -bottom-[2px] h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
