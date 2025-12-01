@@ -246,7 +246,7 @@ const galleryImages = [
   // Events
   {
     id: 25,
-    src: "/images/gallery/IMG_7325.PNG",
+    src: "/images/gallery/IMG_7325.jpg",
     category: "Events",
     title: "Space Talk 2.0",
     description: "An electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, and the mysteries that still leave scientists stunned.",
