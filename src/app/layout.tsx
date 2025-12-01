@@ -1,32 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import type { Metadata } from "next";
 import { ClientBody } from "./ClientBody";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Physics & Astronomy Club | Medicaps University",
   description: "Explore events, research, and community at the Physics & Astronomy Club of Medicaps University.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-dvh bg-[#0a0d14] text-zinc-200 antialiased">
+      <body className="min-h-dvh bg-[#0a0d14] text-zinc-200 antialiased font-sans">
         <ClientBody>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-black/40 bg-black/30 border-b border-white/10">
-              <nav className="mx-auto flex h-14 items-center justify-between">
+            <header className="sticky top-0 z-50">
+              <nav className="flex h-16 items-center justify-between rounded-2xl backdrop-blur-md supports-[backdrop-filter]:bg-black/40 bg-black/30 border border-white/10 shadow-lg shadow-black/20 px-4 sm:px-6">
                 <a href="/" className="group inline-flex items-baseline gap-2">
                   <span className="text-lg font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">Physics & Astronomy Club</span>
                   <span className="hidden sm:inline text-xs text-zinc-400">Medicaps University</span>
@@ -61,8 +54,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
             <footer className="border-t border-white/10 py-8 text-sm text-zinc-400">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p>© {new Date().getFullYear()} Physics & Astronomy Club, Medicaps University</p>
-                <p className="text-zinc-500">Built with Next.js • Bun • shadcn/ui</p>
+                <p>© {new Date().getFullYear()} Physics & Astronomy Club</p>
+                <p className="text-zinc-500">
+                  Developed by{" "}
+                  <a
+                    href="https://neetil.in"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-dotted underline-offset-4 transition-colors hover:text-zinc-200"
+                  >
+                    Neetil
+                  </a>
+                </p>
               </div>
             </footer>
           </div>
