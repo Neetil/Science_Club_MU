@@ -495,6 +495,7 @@ export default function GalleryPage() {
                     <img
                       src={img.src}
                       alt={img.title}
+                      loading="lazy"
                       className="h-full w-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -729,6 +730,7 @@ export default function GalleryPage() {
                           <img
                             src={image.src}
                             alt={image.title}
+                            loading="lazy"
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -803,6 +805,7 @@ export default function GalleryPage() {
                       <img
                         src={image.src}
                         alt={image.title}
+                        loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;

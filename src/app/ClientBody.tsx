@@ -4,54 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-// Preload heavy gallery/hero imagery as soon as the app loads
-const PRELOAD_IMAGES = [
-  "/images/gallery/IMG_7325.jpg",
-  "/images/gallery/IMG_7336.JPEG",
-  "/images/gallery/IMG_7347.JPG",
-  "/images/gallery/IMG_7315.JPEG",
-  "/images/gallery/IMG_7381.JPG",
-  "/images/gallery/IMG_7382.JPG",
-  "/images/gallery/IMG_3004.png",
-  "/images/gallery/IMG_4481.png",
-  "/images/gallery/IMG_4480.png",
-  "/images/gallery/45666.jpg",
-  "/images/gallery/IMG_7334.png",
-  "/images/gallery/IMG_7318.JPEG",
-  "/images/gallery/IMG_7319.JPEG",
-  "/images/gallery/IMG_7324.JPEG",
-  "/images/gallery/IMG_7330.JPEG",
-  "/images/gallery/IMG_7331.JPEG",
-  "/images/gallery/IMG_7337.JPEG",
-  "/images/gallery/IMG_7338.JPEG",
-  "/images/gallery/IMG_7335.png",
-  "/images/gallery/IMG_7342.png",
-  "/images/gallery/IMG_73431.PNG",
-  "/images/gallery/IMG_7313.png",
-  "/images/gallery/IMG_7322.png",
-  "/images/gallery/IMG_2997.JPEG",
-  "/images/gallery/IMG_2998.JPEG",
-  "/images/gallery/IMG_3175.png",
-  "/images/gallery/IMG_3210.png",
-];
-
 export function ClientBody({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const timerRef = useRef<number | null>(null);
-  const hasPreloadedRef = useRef(false);
-
-  // Kick off image preloading once on first client load (any route)
-  useEffect(() => {
-    if (hasPreloadedRef.current) return;
-    hasPreloadedRef.current = true;
-
-    PRELOAD_IMAGES.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
 
   useEffect(() => {
     // Clear any existing timer first
