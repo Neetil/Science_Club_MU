@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ClientBody } from "./ClientBody";
 
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="absolute inset-0 bg-[radial-gradient(1000px_600px_at_30%_-10%,rgba(15,90,120,0.25),transparent),radial-gradient(800px_400px_at_80%_0%,rgba(0,255,255,0.08),transparent)]" />
             <canvas id="stars-canvas" className="absolute inset-0 opacity-30" />
           </div>
+          <Analytics />
         </ClientBody>
       </body>
     </html>
