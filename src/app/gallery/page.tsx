@@ -65,7 +65,7 @@ const heroImages = [
   },
   {
     id: "hero-6",
-    src: "/images/gallery/IMG_4480.png",
+    src: "/images/gallery/IMG_44800.jpg",
     category: "Competitions",
     title: "Physics Competition",
     description: "Members showcasing their problem-solving skills and knowledge in an engaging competitive environment.",
@@ -167,14 +167,14 @@ const galleryImages = [
   },
   {
     id: 12,
-    src: "/images/gallery/IMG_7342.png",
+    src: "/images/gallery/IMG_73422.jpg",
     category: "Team",
     title: "Members Gathering",
     description: "Club members gathering for an event or activity.",
   },
   {
     id: 15,
-    src: "/images/gallery/IMG_73431.PNG",
+    src: "/images/gallery/IMG_73431.jpg",
     category: "Team",
     title: "Team Photo",
     description: "Group photo of the Physics & Astronomy Club team.",
@@ -188,7 +188,7 @@ const galleryImages = [
   },
   {
     id: 17,
-    src: "/images/gallery/IMG_7322.png",
+    src: "/images/gallery/IMG_73222.jpg",
     category: "Team",
     title: "Team Gathering",
     description: "Club members gathering together.",
@@ -231,14 +231,14 @@ const galleryImages = [
   },
   {
     id: 23,
-    src: "/images/gallery/IMG_3175.png",
+    src: "/images/gallery/IMG_31755.jpg",
     category: "Observations",
     title: "Night Sky Photography",
     description: "Capturing the beauty of the night sky through astrophotography.",
   },
   {
     id: 24,
-    src: "/images/gallery/IMG_3210.png",
+    src: "/images/gallery/IMG_32100.jpg",
     category: "Observations",
     title: "Stargazing Event",
     description: "Club members participating in a stargazing event.",
@@ -310,7 +310,7 @@ const galleryImages = [
   },
   {
     id: 34,
-    src: "/images/gallery/IMG_4480.png",
+    src: "/images/gallery/IMG_44800.jpg",
     category: "Competitions",
     title: "Physics Competition",
     description: "Members showcasing their problem-solving skills and knowledge in an engaging competitive environment.",
