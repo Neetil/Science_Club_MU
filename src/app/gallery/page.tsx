@@ -317,6 +317,14 @@ const galleryImages = [
   },
 ];
 
+// Preload all gallery and hero images once when the gallery page mounts
+const allImageSources = Array.from(
+  new Set([
+    ...heroImages.map((img) => img.src),
+    ...galleryImages.map((img) => img.src),
+  ]),
+);
+
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [featuredIndex, setFeaturedIndex] = useState(0);
@@ -326,6 +334,14 @@ export default function GalleryPage() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState<Record<string, boolean>>({});
   const [canScrollRight, setCanScrollRight] = useState<Record<string, boolean>>({});
+
+  // Preload all gallery/hero images once when the page mounts
+  useEffect(() => {
+    allImageSources.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const filteredImages =
     selectedCategory === "All"
@@ -495,7 +511,6 @@ export default function GalleryPage() {
                     <img
                       src={img.src}
                       alt={img.title}
-                      loading="lazy"
                       className="h-full w-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -730,7 +745,6 @@ export default function GalleryPage() {
                           <img
                             src={image.src}
                             alt={image.title}
-                            loading="lazy"
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -805,7 +819,6 @@ export default function GalleryPage() {
                       <img
                         src={image.src}
                         alt={image.title}
-                        loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
