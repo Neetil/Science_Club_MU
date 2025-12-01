@@ -51,7 +51,7 @@ const heroImages = [
   },
   {
     id: "hero-4c",
-    src: "/images/gallery/IMG_3004.png",
+    src: "/images/gallery/IMG_30044.jpg",
     category: "Observations",
     title: "Night Sky Observation",
     description: "Capturing the wonders of the universe through telescope observations and astrophotography sessions.",
@@ -203,7 +203,7 @@ const galleryImages = [
   },
   {
     id: 19,
-    src: "/images/gallery/IMG_3004.png",
+    src: "/images/gallery/IMG_30044.jpg",
     category: "Observations",
     title: "Night Sky Observation",
     description: "Capturing the wonders of the universe through telescope observations and astrophotography sessions.",
@@ -246,7 +246,7 @@ const galleryImages = [
   // Events
   {
     id: 25,
-    src: "/images/gallery/IMG_7325.jpg",
+    src: "/images/gallery/IMG_73255.jpg",
     category: "Events",
     title: "Space Talk 2.0",
     description: "An electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, and the mysteries that still leave scientists stunned.",
