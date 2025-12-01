@@ -58,7 +58,7 @@ const heroImages = [
   },
   {
     id: "hero-5",
-    src: "/images/gallery/IMG_4481.png",
+    src: "/images/gallery/IMG_44811.png",
     category: "Events",
     title: "Blood Gone Bad 2.0",
     description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
@@ -79,7 +79,7 @@ const heroImages = [
   },
   {
     id: "hero-8",
-    src: "/images/gallery/IMG_7334.png",
+    src: "/images/gallery/IMG_73345.jpg",
     category: "Team",
     title: "Club Gathering",
     description: "Celebrating our community spirit and shared passion for physics and astronomy with friends and mentors.",
@@ -104,7 +104,7 @@ const galleryImages = [
   },
   {
     id: 3,
-    src: "/images/gallery/IMG_7334.png",
+    src: "/images/gallery/IMG_73345.jpg",
     category: "Team",
     title: "Club Gathering",
     description: "Celebrating our community spirit and shared passion for physics and astronomy with friends and mentors.",
@@ -160,7 +160,7 @@ const galleryImages = [
   },
   {
     id: 11,
-    src: "/images/gallery/IMG_7335.png",
+    src: "/images/gallery/IMG_73355.jpg",
     category: "Team",
     title: "Group Photo",
     description: "Group photo of club members at an event or gathering.",
@@ -181,7 +181,7 @@ const galleryImages = [
   },
   {
     id: 16,
-    src: "/images/gallery/IMG_7313.png",
+    src: "/images/gallery/IMG_73133.jpg",
     category: "Team",
     title: "Club Members",
     description: "Members of the club together for a photo.",
@@ -253,7 +253,7 @@ const galleryImages = [
   },
   {
     id: 26,
-    src: "/images/gallery/IMG_4481.png",
+    src: "/images/gallery/IMG_44811.png",
     category: "Events",
     title: "Blood Gone Bad 2.0",
     description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
@@ -267,7 +267,7 @@ const galleryImages = [
   },
   {
     id: 28,
-    src: "/images/gallery/IMG_7327.PNG",
+    src: "/images/gallery/IMG_73277.jpg",
     category: "Events",
     title: "Club Event",
     description: "A special event organized by the Physics & Astronomy Club.",
@@ -281,7 +281,7 @@ const galleryImages = [
   },
   {
     id: 30,
-    src: "/images/gallery/IMG_4482.PNG",
+    src: "/images/gallery/IMG_4482.jpg",
     category: "Events",
     title: "Club Event",
     description: "Members participating in a club-organized event.",
