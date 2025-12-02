@@ -61,13 +61,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await saveSubmission({
+    // Try to save submission (non-blocking - file system is read-only on Vercel)
+    saveSubmission({
       name,
       email,
       subject,
       message,
       ip,
       createdAt: new Date().toISOString(),
+    }).catch((error) => {
+      // File saving fails on Vercel (read-only file system) - that's okay
+      console.warn("Failed to save submission to file (non-critical):", error.code);
     });
 
     // Send email notification (non-blocking - don't fail if email fails)
@@ -108,8 +112,19 @@ type Submission = {
 };
 
 async function saveSubmission(submission: Submission) {
+  // Skip file saving on Vercel (read-only file system)
+  // This function only works in local development
   const fileDir = join(process.cwd(), "data");
-  await fs.mkdir(fileDir, { recursive: true });
+  
+  try {
+    await fs.mkdir(fileDir, { recursive: true });
+  } catch (error) {
+    // If we can't create directory (e.g., on Vercel), skip file saving
+    if ((error as NodeJS.ErrnoException).code === "EROFS") {
+      return;
+    }
+    throw error;
+  }
 
   try {
     const contents = await fs.readFile(SUBMISSIONS_FILE, "utf8");
@@ -117,8 +132,22 @@ async function saveSubmission(submission: Submission) {
     parsed.push(submission);
     await fs.writeFile(SUBMISSIONS_FILE, JSON.stringify(parsed, null, 2), "utf8");
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      await fs.writeFile(SUBMISSIONS_FILE, JSON.stringify([submission], null, 2), "utf8");
+    const err = error as NodeJS.ErrnoException;
+    if (err.code === "ENOENT") {
+      // File doesn't exist, create it
+      try {
+        await fs.writeFile(SUBMISSIONS_FILE, JSON.stringify([submission], null, 2), "utf8");
+      } catch (writeError) {
+        // If write fails (e.g., read-only file system on Vercel), just return
+        if ((writeError as NodeJS.ErrnoException).code === "EROFS") {
+          return;
+        }
+        throw writeError;
+      }
+      return;
+    }
+    // If it's a read-only file system error (Vercel), just return silently
+    if (err.code === "EROFS") {
       return;
     }
     throw error;
