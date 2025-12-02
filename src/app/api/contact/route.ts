@@ -74,15 +74,19 @@ export async function POST(request: NextRequest) {
       console.warn("Failed to save submission to file (non-critical):", error.code);
     });
 
-    // Send email notification (non-blocking - don't fail if email fails)
-    sendNotificationEmail({
-      name,
-      email,
-      subject,
-      message,
-    }).catch((error) => {
+    // Send email notification and wait for it to complete so serverless
+    // doesn't shut down before the request to Resend finishes.
+    try {
+      await sendNotificationEmail({
+        name,
+        email,
+        subject,
+        message,
+      });
+    } catch (error) {
+      // Log the error but still return success to the user
       console.error("Email notification failed (non-critical):", error);
-    });
+    }
 
     return NextResponse.json(
       {
