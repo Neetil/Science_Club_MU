@@ -394,9 +394,6 @@ export default function GalleryPage() {
           <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full border border-indigo-500/20 animate-orbit-slow" />
           <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full border border-blue-500/20 animate-orbit-reverse" />
           
-          {/* Gradient Orbs */}
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-orb" style={{ animationDelay: "0s" }} />
-          <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse-orb" style={{ animationDelay: "2s" }} />
         </div>
 
         <div className="relative z-10 text-center space-y-8 max-w-5xl mx-auto">
