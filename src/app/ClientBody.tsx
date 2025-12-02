@@ -52,18 +52,43 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading) return;
-    let frame = 0;
     const start = performance.now();
+    let frameId = 0;
+    let intervalId: number | null = null;
 
-    const tick = (now: number) => {
-      const next = Math.min((now - start) / 6000, 1);
+    const updateProgress = () => {
+      const elapsed = performance.now() - start;
+      const next = Math.min(elapsed / 6000, 1);
       setProgress(next);
-      if (next < 1) frame = requestAnimationFrame(tick);
+      return next;
     };
 
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [isLoading, pathname]);
+    const animate = () => {
+      const next = updateProgress();
+      if (next < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    // Fallback updates while the tab is hidden (rAF pauses when not visible)
+    intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") return;
+      const next = updateProgress();
+      if (next >= 1 && intervalId !== null) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    }, 250);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      if (intervalId !== null) {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, [isLoading]);
 
   useEffect(() => {
     const canvas = document.getElementById("stars-canvas") as HTMLCanvasElement | null;
@@ -105,21 +130,6 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
         ctx.beginPath();
         ctx.arc(px, py, r, 0, Math.PI * 2);
         ctx.fill();
-      }
-
-      ctx.globalAlpha = 0.25;
-      ctx.strokeStyle = "rgba(56,189,248,0.35)";
-      for (let i = 0; i < 5; i++) {
-        const y = ((performance.now() / 2000 + i * 0.2) % 1) * h;
-        ctx.beginPath();
-        for (let x = 0; x <= w; x += 6) {
-          const t = (x / w) * Math.PI * 2;
-          const offset = Math.sin(t + i) * 10 * DPR;
-          const yy = y + offset;
-          if (x === 0) ctx.moveTo(x, yy);
-          else ctx.lineTo(x, yy);
-        }
-        ctx.stroke();
       }
 
       raf = requestAnimationFrame(render);

@@ -98,10 +98,10 @@ The final clue leads to a special antidote, marking the completion of the challe
       </section>
 
       {/* Updates Panel */}
-      <section id="updates" className="grid gap-6 md:grid-cols-3">
-        <div className="col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold text-white">Latest Updates</h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
+      <section id="updates" className="space-y-4">
+        <h2 className="text-xl font-semibold text-white">Latest Updates</h2>
+        <div className="grid gap-6 md:grid-cols-3">
+          <ul className="col-span-2 grid gap-4 sm:grid-cols-2">
             {updates.map((update) => (
               <li
                 key={update.id}
@@ -119,17 +119,24 @@ The final clue leads to a special antidote, marking the completion of the challe
               </li>
             ))}
           </ul>
-        </div>
-        <aside className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <h3 className="text-base font-semibold text-white">Quick Links</h3>
-          <ul className="mt-3 space-y-2 text-sm text-zinc-300">
-            <li><a href="/about" className="hover:text-white">About the Club</a></li>
-            <li><a href="/events" className="hover:text-white">Events</a></li>
-            <li><a href="/gallery" className="hover:text-white">Gallery</a></li>
-            <li><a href="/team" className="hover:text-white">Team</a></li>
-            <li><a href="/contact" className="hover:text-white">Contact</a></li>
-          </ul>
+          <aside className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <h3 className="text-base font-semibold text-white mb-4 text-center">Club Statistics</h3>
+          <div className="space-y-4">
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+              <p className="text-xs text-zinc-400 mb-1">Events conducted</p>
+              <p className="text-2xl font-bold text-cyan-300">10+</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+              <p className="text-xs text-zinc-400 mb-1">Active members</p>
+              <p className="text-2xl font-bold text-cyan-300">60+</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+              <p className="text-xs text-zinc-400 mb-1">Outreach trips</p>
+              <p className="text-2xl font-bold text-cyan-300">5+</p>
+            </div>
+          </div>
         </aside>
+        </div>
       </section>
 
       {/* Expanded update modal with subtle spring animation */}
