@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const categories = ["All", "Team", "Observations", "Events", "Workshops", "Competitions"];
+const categories = ["All", "Team", "Astronomy Night", "Outreach Visits", "Observations", "Events", "Workshops"];
 
 // Hero images for the featured showcase section
 const heroImages = [
@@ -17,7 +17,7 @@ const heroImages = [
   {
     id: "hero-2",
     src: "/images/gallery/IMG_7336.JPEG",
-    category: "Observations",
+    category: "Astronomy Night",
     title: "Astronomy Night",
     description: "Exploring the night sky with telescopes and capturing the beauty of celestial objects under a clear dark sky.",
   },
@@ -32,7 +32,7 @@ const heroImages = [
     id: "hero-4",
     src: "/images/gallery/IMG_7315.JPEG",
     category: "Workshops",
-    title: "Science Workshop",
+    title: "Astronomy Night",
     description: "Hands-on learning experience where members dive deep into practical experiments and scientific concepts.",
   },
   {
@@ -57,6 +57,13 @@ const heroImages = [
     description: "Capturing the wonders of the universe through telescope observations and astrophotography sessions.",
   },
   {
+    id: "hero-9",
+    src: "/images/gallery/IMG_2997.JPEG",
+    category: "Outreach Visits",
+    title: "Educational Outreach Visit",
+    description: "Sharing scientific knowledge and inspiring students through educational outreach programs and visits.",
+  },
+  {
     id: "hero-5",
     src: "/images/gallery/IMG_44811.jpg",
     category: "Events",
@@ -66,7 +73,7 @@ const heroImages = [
   {
     id: "hero-6",
     src: "/images/gallery/IMG_44800.jpg",
-    category: "Competitions",
+    category: "Observations",
     title: "Physics Competition",
     description: "Members showcasing their problem-solving skills and knowledge in an engaging competitive environment.",
   },
@@ -87,7 +94,7 @@ const heroImages = [
 ];
 
 const galleryImages = [
-  // Team Photos
+  // Team
   {
     id: 1,
     src: "/images/gallery/IMG_7347.JPG",
@@ -103,67 +110,11 @@ const galleryImages = [
     description: "Working together as a unified team to organize events, conduct research, and share knowledge with the community.",
   },
   {
-    id: 3,
-    src: "/images/gallery/IMG_73345.jpg",
-    category: "Team",
-    title: "Club Gathering",
-    description: "Celebrating our community spirit and shared passion for physics and astronomy with friends and mentors.",
-  },
-  {
-    id: 4,
-    src: "/images/gallery/IMG_7318.JPEG",
-    category: "Team",
-    title: "Team Members",
-    description: "Members of the Physics & Astronomy Club coming together for a group photo.",
-  },
-  {
-    id: 5,
-    src: "/images/gallery/IMG_7319.JPEG",
-    category: "Team",
-    title: "Club Members",
-    description: "A gathering of enthusiastic club members sharing their passion for science.",
-  },
-  {
-    id: 6,
-    src: "/images/gallery/IMG_7324.JPEG",
-    category: "Team",
-    title: "Team Photo",
-    description: "Group photo of the Physics & Astronomy Club members.",
-  },
-  {
-    id: 7,
-    src: "/images/gallery/IMG_7330.JPEG",
-    category: "Team",
-    title: "Club Team",
-    description: "Members of the club posing together for a memorable team photo.",
-  },
-  {
-    id: 8,
-    src: "/images/gallery/IMG_7331.JPEG",
-    category: "Team",
-    title: "Team Gathering",
-    description: "Club members gathering together for an event or meeting.",
-  },
-  {
-    id: 9,
-    src: "/images/gallery/IMG_7337.JPEG",
-    category: "Team",
-    title: "Club Members Together",
-    description: "Members of the Physics & Astronomy Club enjoying time together.",
-  },
-  {
     id: 10,
     src: "/images/gallery/IMG_7338.JPEG",
     category: "Team",
     title: "Team Photo Session",
     description: "A fun team photo session with club members.",
-  },
-  {
-    id: 11,
-    src: "/images/gallery/IMG_73355.jpg",
-    category: "Team",
-    title: "Group Photo",
-    description: "Group photo of club members at an event or gathering.",
   },
   {
     id: 12,
@@ -180,61 +131,122 @@ const galleryImages = [
     description: "Group photo of the Physics & Astronomy Club team.",
   },
   {
-    id: 16,
-    src: "/images/gallery/IMG_73133.jpg",
-    category: "Team",
-    title: "Club Members",
-    description: "Members of the club together for a photo.",
-  },
-  {
-    id: 17,
-    src: "/images/gallery/IMG_73222.jpg",
-    category: "Team",
-    title: "Team Gathering",
-    description: "Club members gathering together.",
-  },
-  // Observations
-  {
-    id: 18,
-    src: "/images/gallery/IMG_7336.JPEG",
-    category: "Observations",
-    title: "Astronomy Night",
-    description: "Exploring the night sky with telescopes and capturing the beauty of celestial objects under a clear dark sky.",
-  },
-  {
     id: 19,
     src: "/images/gallery/IMG_30044.jpg",
-    category: "Observations",
+    category: "Team",
     title: "Night Sky Observation",
     description: "Capturing the wonders of the universe through telescope observations and astrophotography sessions.",
   },
   {
     id: 20,
     src: "/images/gallery/45666.jpg",
-    category: "Observations",
+    category: "Team",
     title: "Star Gazing Session",
     description: "A memorable night of observing planets, stars, and constellations through our advanced telescope equipment.",
   },
   {
+    id: 27,
+    src: "/images/gallery/IMG_7381.JPG",
+    category: "Team",
+    title: "Club Event Celebration",
+    description: "Members coming together to celebrate achievements and milestones in our journey of cosmic exploration.",
+  },
+
+  // Astronomy Night
+  {
+    id: 3,
+    src: "/images/gallery/IMG_73345.jpg",
+    category: "Astronomy Night",
+    title: "Club Gathering",
+    description: "Celebrating our community spirit and shared passion for physics and astronomy with friends and mentors.",
+  },
+  {
+    id: 4,
+    src: "/images/gallery/IMG_7318.JPEG",
+    category: "Astronomy Night",
+    title: "Team Members",
+    description: "Members of the Physics & Astronomy Club coming together for a group photo.",
+  },
+  {
+    id: 5,
+    src: "/images/gallery/IMG_7319.JPEG",
+    category: "Astronomy Night",
+    title: "Club Members",
+    description: "A gathering of enthusiastic club members sharing their passion for science.",
+  },
+  {
     id: 21,
     src: "/images/gallery/IMG_2997.JPEG",
-    category: "Observations",
+    category: "Astronomy Night",
     title: "Telescope Observation",
     description: "Members using telescopes to observe celestial objects in the night sky.",
   },
   {
     id: 22,
     src: "/images/gallery/IMG_2998.JPEG",
-    category: "Observations",
+    category: "Astronomy Night",
     title: "Astronomy Session",
     description: "An astronomy observation session with club members.",
   },
   {
+    id: 30,
+    src: "/images/gallery/IMG_4482.jpg",
+    category: "Astronomy Night",
+    title: "Club Event",
+    description: "Members participating in a club-organized event.",
+  },
+  {
+    id: 33,
+    src: "/images/gallery/IMG_7315.JPEG",
+    category: "Astronomy Night",
+    title: "Science Workshop",
+    description: "Hands-on learning experience where members dive deep into practical experiments and scientific concepts.",
+  },
+
+  // Outreach Visits
+  {
+    id: 8,
+    src: "/images/gallery/IMG_7331.JPEG",
+    category: "Outreach Visits",
+    title: "Team Gathering",
+    description: "Club members gathering together for an event or meeting.",
+  },
+  {
     id: 23,
     src: "/images/gallery/IMG_31755.jpg",
-    category: "Observations",
+    category: "Outreach Visits",
     title: "Night Sky Photography",
     description: "Capturing the beauty of the night sky through astrophotography.",
+  },
+  {
+    id: 29,
+    src: "/images/gallery/IMG_7329.JPG",
+    category: "Outreach Visits",
+    title: "Event Session",
+    description: "An engaging event session with club members and participants.",
+  },
+  {
+    id: 31,
+    src: "/images/gallery/123.jpg",
+    category: "Outreach Visits",
+    title: "Event Photo",
+    description: "A moment captured during one of our club events.",
+  },
+  {
+    id: 32,
+    src: "/images/gallery/55.jpg",
+    category: "Outreach Visits",
+    title: "Club Event",
+    description: "An event organized by the Physics & Astronomy Club.",
+  },
+
+  // Observations
+  {
+    id: 17,
+    src: "/images/gallery/IMG_73222.jpg",
+    category: "Observations",
+    title: "Observ",
+    description: "Club members gathering together.",
   },
   {
     id: 24,
@@ -243,7 +255,64 @@ const galleryImages = [
     title: "Stargazing Event",
     description: "Club members participating in a stargazing event.",
   },
+  {
+    id: 26,
+    src: "/images/gallery/IMG_44811.jpg",
+    category: "Observations",
+    title: "Blood Gone Bad 2.0",
+    description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
+  },
+  {
+    id: 34,
+    src: "/images/gallery/IMG_44800.jpg",
+    category: "Observations",
+    title: "Physics Competition",
+    description: "Members showcasing their problem-solving skills and knowledge in an engaging competitive environment.",
+  },
+
   // Events
+  {
+    id: 6,
+    src: "/images/gallery/IMG_7324.JPEG",
+    category: "Events",
+    title: "Team Photo",
+    description: "Group photo of the Physics & Astronomy Club members.",
+  },
+  {
+    id: 7,
+    src: "/images/gallery/IMG_7330.JPEG",
+    category: "Events",
+    title: "Club Team",
+    description: "Members of the club posing together for a memorable team photo.",
+  },
+  {
+    id: 9,
+    src: "/images/gallery/IMG_7337.JPEG",
+    category: "Events",
+    title: "Club Members Together",
+    description: "Members of the Physics & Astronomy Club enjoying time together.",
+  },
+  {
+    id: 11,
+    src: "/images/gallery/IMG_73355.jpg",
+    category: "Events",
+    title: "Group Photo",
+    description: "Group photo of club members at an event or gathering.",
+  },
+  {
+    id: 16,
+    src: "/images/gallery/IMG_73133.jpg",
+    category: "Events",
+    title: "Club Members",
+    description: "Members of the club together for a photo.",
+  },
+  {
+    id: 18,
+    src: "/images/gallery/IMG_7336.JPEG",
+    category: "Events",
+    title: "Astronomy Night",
+    description: "Exploring the night sky with telescopes and capturing the beauty of celestial objects under a clear dark sky.",
+  },
   {
     id: 25,
     src: "/images/gallery/IMG_73255.jpg",
@@ -252,69 +321,14 @@ const galleryImages = [
     description: "An electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, and the mysteries that still leave scientists stunned.",
   },
   {
-    id: 26,
-    src: "/images/gallery/IMG_44811.jpg",
-    category: "Events",
-    title: "Blood Gone Bad 2.0",
-    description: "An exciting campus-wide treasure hunt where participants follow creative clues hidden across different locations.",
-  },
-  {
-    id: 27,
-    src: "/images/gallery/IMG_7381.JPG",
-    category: "Events",
-    title: "Club Event Celebration",
-    description: "Members coming together to celebrate achievements and milestones in our journey of cosmic exploration.",
-  },
-  {
     id: 28,
     src: "/images/gallery/IMG_73277.jpg",
     category: "Events",
     title: "Club Event",
     description: "A special event organized by the Physics & Astronomy Club.",
   },
-  {
-    id: 29,
-    src: "/images/gallery/IMG_7329.JPG",
-    category: "Events",
-    title: "Event Session",
-    description: "An engaging event session with club members and participants.",
-  },
-  {
-    id: 30,
-    src: "/images/gallery/IMG_4482.jpg",
-    category: "Events",
-    title: "Club Event",
-    description: "Members participating in a club-organized event.",
-  },
-  {
-    id: 31,
-    src: "/images/gallery/123.jpg",
-    category: "Events",
-    title: "Event Photo",
-    description: "A moment captured during one of our club events.",
-  },
-  {
-    id: 32,
-    src: "/images/gallery/55.jpg",
-    category: "Events",
-    title: "Club Event",
-    description: "An event organized by the Physics & Astronomy Club.",
-  },
+
   // Workshops
-  {
-    id: 33,
-    src: "/images/gallery/IMG_7315.JPEG",
-    category: "Workshops",
-    title: "Science Workshop",
-    description: "Hands-on learning experience where members dive deep into practical experiments and scientific concepts.",
-  },
-  {
-    id: 34,
-    src: "/images/gallery/IMG_44800.jpg",
-    category: "Competitions",
-    title: "Physics Competition",
-    description: "Members showcasing their problem-solving skills and knowledge in an engaging competitive environment.",
-  },
 ];
 
 export default function GalleryPage() {
@@ -513,7 +527,7 @@ export default function GalleryPage() {
               <div className="absolute inset-0 border border-indigo-400/30 rounded-3xl animate-pulse-slow pointer-events-none" />
               
               {/* Content Overlay with Slide Animation */}
-              <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 sm:p-12 text-white">
+              <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 sm:p-12 pb-10 sm:pb-14 text-white">
                 <div className="max-w-2xl transform transition-all duration-700 group-hover:translate-y-0">
                   <div
                     key={featuredIndex}
@@ -522,7 +536,7 @@ export default function GalleryPage() {
                     <span className="inline-flex rounded-full bg-indigo-500/30 px-4 py-1.5 text-sm text-indigo-200 ring-1 ring-indigo-500/50 mb-4 backdrop-blur-sm animate-pulse-slow">
                       {currentFeatured.category}
                     </span>
-                    <h2 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent animate-text-shimmer">
+                    <h2 className="text-4xl sm:text-5xl font-bold mb-3 pb-2 leading-[1.2] bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent animate-text-shimmer">
                       {currentFeatured.title}
                     </h2>
                     <p className="text-lg text-indigo-200 animate-fade-in-delay">{currentFeatured.description}</p>
