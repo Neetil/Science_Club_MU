@@ -437,8 +437,6 @@ export default function GalleryPage() {
                 </span>
               </span>
             </h1>
-            {/* Decorative Lines */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent animate-line-expand z-0 pointer-events-none" />
           </div>
 
           {/* Subtitle with Typewriter Effect */}
@@ -475,16 +473,6 @@ export default function GalleryPage() {
             <div className="h-1 w-32 bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-underline-expand" />
           </div>
         </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce-slow">
-          <div className="flex flex-col items-center gap-2 text-indigo-400/60">
-            <span className="text-xs uppercase tracking-wider">Scroll</span>
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </div>
-        </div>
       </section>
 
       {/* Featured Image Showcase - Advanced */}
@@ -515,7 +503,6 @@ export default function GalleryPage() {
                     />
                     {/* Animated Gradient Overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/30 via-transparent to-blue-900/30 animate-gradient-shift" />
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer-slow" />
                   </div>
@@ -560,11 +547,7 @@ export default function GalleryPage() {
                         : "w-2 bg-indigo-400/40 hover:bg-indigo-400/60 hover:scale-125"
                     }`}
                     aria-label={`Go to image ${index + 1}`}
-                  >
-                    {index === featuredIndex && (
-                      <div className="absolute inset-0 rounded-full bg-indigo-400 animate-ping opacity-75" />
-                    )}
-                  </button>
+                  />
                 ))}
               </div>
 
