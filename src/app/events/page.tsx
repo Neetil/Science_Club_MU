@@ -6,43 +6,14 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-20">
       {/* Hero Section - Advanced */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-950/40 via-teal-950/30 to-cyan-950/40" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse-orb" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl animate-pulse-orb" style={{ animationDelay: "2s" }} />
-          {/* Floating Particles */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-emerald-400/20 animate-float-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${Math.random() * 4 + 2}px`,
-                height: `${Math.random() * 4 + 2}px`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 10 + 10}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 text-center space-y-6 max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-3 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-6 py-2 text-xs uppercase tracking-wider text-emerald-200 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-            </span>
-            Upcoming Events
-          </div>
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200">
+      <section className="relative overflow-hidden">
+        <div className="relative space-y-6 text-center">
+          <h1 className="text-5xl font-black tracking-tight text-white sm:text-6xl">
             Events
           </h1>
-          <p className="text-xl sm:text-2xl text-zinc-300 max-w-2xl mx-auto">
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed text-zinc-300">
             Discover, learn, and connect through our exciting lineup of scientific events
           </p>
         </div>
