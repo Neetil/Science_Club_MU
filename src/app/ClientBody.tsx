@@ -172,11 +172,10 @@ function LaunchOverlay({ progress }: { progress: number }) {
         <div className="relative h-32 w-32">
           <div className="absolute inset-0 rounded-full border border-cyan-400/25 animate-[spin_14s_linear_infinite]" />
           <div className="absolute inset-3 rounded-full border border-sky-400/40 animate-[spin_9s_linear_infinite_reverse]" />
-          <div className="animate-launch-glow absolute inset-6 rounded-full bg-gradient-to-br from-cyan-400 via-sky-300 to-blue-600 shadow-lg shadow-cyan-500/40" />
+          <div className="absolute inset-6 rounded-full bg-gradient-to-br from-cyan-400 via-sky-300 to-blue-600 shadow-lg shadow-cyan-500/40" />
           <div className="absolute inset-6 flex items-center justify-center text-3xl font-bold tracking-tight text-white">
             PA
           </div>
-          <span className="animate-shooting-star absolute left-[-15%] top-1/2 h-1 w-16 rounded-full bg-gradient-to-r from-transparent via-cyan-100 to-transparent" />
         </div>
 
         <div className="space-y-1">
