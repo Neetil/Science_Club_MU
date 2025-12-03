@@ -7,7 +7,6 @@ export default function AboutPage() {
     <div className="space-y-20">
       {/* Hero Section - Different Style */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 blur-3xl" />
         <div className="relative space-y-6 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs uppercase tracking-wider text-amber-200">
             <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
