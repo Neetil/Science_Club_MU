@@ -1,9 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  category: string;
+  image?: string;
+}
 
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch("/api/events");
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-20">
@@ -19,7 +50,7 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* Placeholder Message */}
+      {/* Upcoming Events Banner */}
       <section className="px-4">
         <div className="max-w-4xl mx-auto">
           <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/30 via-teal-950/20 to-cyan-950/30 backdrop-blur-sm p-12 sm:p-16 text-center">
@@ -106,64 +137,18 @@ export default function EventsPage() {
             </div>
           </div>
 
+          {loading ? (
+            <div className="text-center py-12 text-zinc-400">
+              <p>Loading events...</p>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-12 text-zinc-400">
+              <p className="text-lg mb-2">No events available</p>
+              <p className="text-sm">Check back soon for upcoming events</p>
+            </div>
+          ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Space Talk 2.0",
-                description: "An electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, and the mysteries of our cosmos.",
-                category: "Lecture",
-              },
-              {
-                title: "Blood Gone Bad 2.0",
-                description: "An exciting campus-wide treasure hunt where participants followed creative clues hidden across different locations.",
-                category: "Competition",
-              },
-              {
-                title: "Astronomy Night",
-                description: "A mesmerizing stargazing session where members explored the night sky, identified constellations, and observed celestial wonders.",
-                category: "Observation",
-              },
-              {
-                title: "Outreach to Ujjain",
-                description: "An educational outreach program where we shared scientific knowledge and inspired students in Ujjain.",
-                category: "Outreach",
-              },
-              {
-                title: "Outreach to ISRO Exhibition",
-                description: "A visit to the ISRO Exhibition where students explored real satellite models, rocket designs, and cutting-edge space technology.",
-                category: "Outreach",
-              },
-              {
-                title: "Outreach to IIT",
-                description: "An inspiring visit to IIT where members learned about advanced research and innovation in physics and astronomy.",
-                category: "Outreach",
-              },
-              {
-                title: "Space Talk",
-                description: "An engaging lecture series exploring fundamental concepts in physics and astronomy, featuring expert speakers and interactive discussions.",
-                category: "Lecture",
-              },
-              {
-                title: "Blood Gone Bad",
-                description: "The first edition of our thrilling treasure hunt event that challenged participants to solve puzzles and navigate through campus clues.",
-                category: "Competition",
-              },
-              {
-                title: "Tambola - Tales of Science",
-                description: "A fun-filled science-themed tambola event that combined entertainment with learning about scientific concepts and discoveries.",
-                category: "Fun Event",
-              },
-              {
-                title: "Mini Project Exhibition",
-                description: "A comprehensive showcase of scientific projects, experiments, and innovations created by students, featuring interactive displays and demonstrations.",
-                category: "Exhibition",
-              },
-              {
-                title: "Workshop on Innovative Solution",
-                description: "An interactive workshop focused on developing creative solutions to real-world problems through scientific thinking and innovative approaches.",
-                category: "Workshop",
-              },
-            ]
+              {events
             .filter((event) => {
               if (!searchQuery.trim()) return true;
               const query = searchQuery.toLowerCase();
@@ -173,9 +158,9 @@ export default function EventsPage() {
                 event.category.toLowerCase().includes(query)
               );
             })
-            .map((event, index) => (
+                .map((event) => (
               <div
-                key={event.title}
+                    key={event.id}
                 className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-teal-950/10 p-6 transition-all hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-900/20 hover:-translate-y-1"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition" />
@@ -193,6 +178,7 @@ export default function EventsPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
     </div>

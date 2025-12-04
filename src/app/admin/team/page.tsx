@@ -78,9 +78,20 @@ export default function TeamPage() {
       )}
 
       <div className="space-y-8">
+        {mentors.length > 0 && (
+          <section>
+            <h2 className="text-xl font-semibold text-white mb-4">Mentors</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {mentors.map((member) => (
+                <MemberCard key={member.id} member={member} onEdit={setEditingMember} onDelete={handleDelete} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {executives.length > 0 && (
           <section>
-            <h2 className="text-xl font-semibold text-white mb-4">Executive Team</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">Command</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {executives.map((member) => (
                 <MemberCard key={member.id} member={member} onEdit={setEditingMember} onDelete={handleDelete} />
@@ -91,20 +102,9 @@ export default function TeamPage() {
 
         {coordinators.length > 0 && (
           <section>
-            <h2 className="text-xl font-semibold text-white mb-4">Coordinators</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">Mission Control</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {coordinators.map((member) => (
-                <MemberCard key={member.id} member={member} onEdit={setEditingMember} onDelete={handleDelete} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {mentors.length > 0 && (
-          <section>
-            <h2 className="text-xl font-semibold text-white mb-4">Mentors</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mentors.map((member) => (
                 <MemberCard key={member.id} member={member} onEdit={setEditingMember} onDelete={handleDelete} />
               ))}
             </div>
