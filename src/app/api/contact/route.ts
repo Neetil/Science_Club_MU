@@ -7,7 +7,6 @@ const RATE_LIMIT_MAX_REQUESTS = 5;
 const SUBMISSIONS_FILE = join(process.cwd(), "data", "contact-submissions.json");
 
 declare global {
-  // eslint-disable-next-line no-var
   var contactRateLimitStore: Map<string, { count: number; expiresAt: number }>;
 }
 

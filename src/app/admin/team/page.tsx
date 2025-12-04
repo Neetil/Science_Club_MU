@@ -260,7 +260,7 @@ function MemberForm({
             <select
               required
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as TeamMember["category"] })}
               className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
             >
               <option value="executive">Executive</option>

@@ -152,7 +152,7 @@ export default function GalleryPage() {
   // Memoize category images for lightbox
   const lightboxCategoryImages = useMemo(
     () => selectedImage ? galleryImages.filter((img) => img.category === selectedImage.category) : [],
-    [selectedImage?.category, galleryImages]
+    [selectedImage, galleryImages]
   );
 
   // Ensure featuredIndex is valid
@@ -164,12 +164,12 @@ export default function GalleryPage() {
 
   // Auto-rotate featured image
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || heroImages.length === 0) return;
     const interval = setInterval(() => {
       setFeaturedIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, heroImages.length]);
 
   // Touch swipe handlers
   const minSwipeDistance = 50;

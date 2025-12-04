@@ -40,7 +40,7 @@ export default function AdminDashboard() {
       }
       if (contactRes.ok) {
         const contact = await contactRes.json();
-        const unread = contact.filter((c: any) => !c.read).length;
+        const unread = contact.filter((c: { read?: boolean }) => !c.read).length;
         setStats((prev) => ({ ...prev, messages: unread }));
       }
       if (updatesRes.ok) {
