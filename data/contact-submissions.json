@@ -5,7 +5,8 @@
     "subject": "general",
     "message": "fff",
     "ip": "127.0.0.1",
-    "createdAt": "2025-11-28T15:48:04.845Z"
+    "createdAt": "2025-11-28T15:48:04.845Z",
+    "read": true
   },
   {
     "name": "vvv",
