@@ -5,8 +5,24 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const categories = ["All", "Team", "Astronomy Night", "Outreach Visits", "Observations", "Events", "Workshops"];
 
-// Hero images for the featured showcase section
-const heroImages = [
+interface HeroImage {
+  id: string;
+  src: string;
+  category: string;
+  title: string;
+  description?: string;
+}
+
+interface GalleryImage {
+  id: string | number;
+  src: string;
+  category: string;
+  title: string;
+  description?: string;
+}
+
+// Hero images for the featured showcase section - hardcoded
+const defaultHeroImages: HeroImage[] = [
   {
     id: "hero-1",
     src: "/images/gallery/IMG_73255.jpg",
@@ -93,254 +109,58 @@ const heroImages = [
   },
 ];
 
-const galleryImages = [
-  // Team
-  {
-    id: 1,
-    src: "/images/gallery/IMG_7347.JPG",
-    category: "Team",
-    title: "Club Team Photo",
-  },
-  {
-    id: 27,
-    src: "/images/gallery/IMG_7381.JPG",
-    category: "Team",
-    title: "Team Council",
-  },
-  {
-    id: 2,
-    src: "/images/gallery/IMG_7382.JPG",
-    category: "Team",
-    title: "Team Heads",
-  },
-  {
-    id: 10,
-    src: "/images/gallery/IMG_7338.JPEG",
-    category: "Team",
-    title: "Team Photo Session",
-  },
-  {
-    id: 12,
-    src: "/images/gallery/IMG_73422.jpg",
-    category: "Team",
-    title: "Randoms",
-  },
-  {
-    id: 15,
-    src: "/images/gallery/IMG_73431.jpg",
-    category: "Team",
-    title: "Parade",
-  },
-  {
-    id: 19,
-    src: "/images/gallery/IMG_30044.jpg",
-    category: "Team",
-    title: "All Members",
-  },
-  {
-    id: 20,
-    src: "/images/gallery/45666.jpg",
-    category: "Team",
-    title: "Spider Man Moment",
-  },
- 
-
-  // Astronomy Night
-  {
-    id: 3,
-    src: "/images/gallery/IMG_73345.jpg",
-    category: "Astronomy Night",
-    title: "Club Gathering",
-  },
-  {
-    id: 4,
-    src: "/images/gallery/IMG_7318.JPEG",
-    category: "Astronomy Night",
-    title: "Moon Clicked",
-  },
-  {
-    id: 5,
-    src: "/images/gallery/IMG_7319.JPEG",
-    category: "Astronomy Night",
-    title: "Astronomy Night",
-  },
-  {
-    id: 21,
-    src: "/images/gallery/IMG_2997.JPEG",
-    category: "Astronomy Night",
-    title: "Night Events",
-  },
-  {
-    id: 22,
-    src: "/images/gallery/IMG_2998.JPEG",
-    category: "Astronomy Night",
-    title: "Telescope Observation",
-  },
-  {
-    id: 30,
-    src: "/images/gallery/IMG_4482.jpg",
-    category: "Astronomy Night",
-    title: "Telescope Observation",
-  },
-  {
-    id: 33,
-    src: "/images/gallery/IMG_7315.JPEG",
-    category: "Astronomy Night",
-    title: "Telescope Observation",
-  },
-
-  // Outreach Visits
-  {
-    id: 8,
-    src: "/images/gallery/IMG_7331.JPEG",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-  {
-    id: 40,
-    src: "/images/gallery/IMG_74322.jpg",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-  {
-    id: 23,
-    src: "/images/gallery/IMG_31755.jpg",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-  {
-    id: 29,
-    src: "/images/gallery/IMG_7329.JPG",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-  {
-    id: 31,
-    src: "/images/gallery/123.jpg",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-  {
-    id: 32,
-    src: "/images/gallery/55.jpg",
-    category: "Outreach Visits",
-    title: "Outreach",
-  },
-
-  // Observations
-  {
-    id: 17,
-    src: "/images/gallery/IMG_73222.jpg",
-    category: "Observations",
-    title: "Showcasing Project",
-  },
-  {
-    id: 24,
-    src: "/images/gallery/IMG_32100.jpg",
-    category: "Observations",
-    title: "Agriculture Drone",
-  },
-  {
-    id: 26,
-    src: "/images/gallery/IMG_44811.jpg",
-    category: "Observations",
-    title: "Satellite Model",
-  },
-  {
-    id: 34,
-    src: "/images/gallery/IMG_44800.jpg",
-    category: "Observations",
-    title: "Rocket Model",
-  },
-  {
-    id: 41,
-    src: "/images/gallery/IMG_74311.jpg",
-    category: "Observations",
-    title: "GSLV Model",
-  },
-
-  // Events
-  {
-    id: 6,
-    src: "/images/gallery/IMG_7324.JPEG",
-    category: "Events",
-    title: "Workshop on Innovative Solution",
-  },
-  {
-    id: 7,
-    src: "/images/gallery/IMG_7330.JPEG",
-    category: "Events",
-    title: "Galaxies and Black Holes",
-  },
-  {
-    id: 9,
-    src: "/images/gallery/IMG_7337.JPEG",
-    category: "Events",
-    title: "The Big Bang Theory",
-  },
-  {
-    id: 11,
-    src: "/images/gallery/IMG_73355.jpg",
-    category: "Events",
-    title: "Event Discussions",
-  },
-  {
-    id: 16,
-    src: "/images/gallery/IMG_73133.jpg",
-    category: "Events",
-    title: "Tambola Tales of Science",
-  },
-  {
-    id: 18,
-    src: "/images/gallery/IMG_7336.JPEG",
-    category: "Events",
-    title: "Space Talk 2.0",
-  },
-  {
-    id: 25,
-    src: "/images/gallery/IMG_73255.jpg",
-    category: "Events",
-    title: "Orientation Ceremony",
-  },
-  {
-    id: 28,
-    src: "/images/gallery/IMG_73277.jpg",
-    category: "Events",
-    title: "Space Talk",
-  },
-
-  // Workshops
-];
-
 export default function GalleryPage() {
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<(typeof galleryImages[0] & { description?: string }) | null>(null);
+  const [selectedImage, setSelectedImage] = useState<(GalleryImage & { description?: string }) | null>(null);
   const [scrollPositions, setScrollPositions] = useState<Record<string, number>>({});
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState<Record<string, boolean>>({});
   const [canScrollRight, setCanScrollRight] = useState<Record<string, boolean>>({});
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [galleryImagesState, setGalleryImagesState] = useState<GalleryImage[]>([]);
+
+  // Fetch gallery data
+  useEffect(() => {
+    fetchGalleryData();
+  }, []);
+
+  const fetchGalleryData = async () => {
+    try {
+      const galleryRes = await fetch("/api/gallery");
+
+      if (galleryRes.ok) {
+        const galleryData = await galleryRes.json();
+        setGalleryImagesState(galleryData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch gallery data:", error);
+    }
+  };
+
+  // Always use default hero images (they are hardcoded and should not be changed)
+  const heroImages = defaultHeroImages;
+  const galleryImages = galleryImagesState;
 
   // Memoize filtered images for expanded modal
   const expandedCategoryImages = useMemo(
     () => expandedCategory ? galleryImages.filter((img) => img.category === expandedCategory) : [],
-    [expandedCategory]
+    [expandedCategory, galleryImages]
   );
 
   // Memoize category images for lightbox
   const lightboxCategoryImages = useMemo(
     () => selectedImage ? galleryImages.filter((img) => img.category === selectedImage.category) : [],
-    [selectedImage?.category]
+    [selectedImage?.category, galleryImages]
   );
 
   // Ensure featuredIndex is valid
   useEffect(() => {
-    if (featuredIndex >= heroImages.length) {
+    if (featuredIndex >= heroImages.length && heroImages.length > 0) {
       setFeaturedIndex(0);
     }
-  }, [featuredIndex]);
+  }, [featuredIndex, heroImages.length]);
 
   // Auto-rotate featured image
   useEffect(() => {
@@ -904,7 +724,7 @@ export default function GalleryPage() {
                   </div>
                   <h3 className="text-3xl font-bold text-white mb-2">{selectedImage.title}</h3>
                   {selectedImage.description && (
-                    <p className="text-zinc-300">{selectedImage.description}</p>
+                  <p className="text-zinc-300">{selectedImage.description}</p>
                   )}
                 </div>
               </div>

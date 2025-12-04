@@ -1,73 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+interface Update {
+  id: string;
+  date: string;
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+}
+
+interface Statistics {
+  eventsConducted: number;
+  activeMembers: number;
+  outreachTrips: number;
+}
+
 export default function Page() {
-  const [expandedPanel, setExpandedPanel] = useState<number | null>(null);
+  const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
+  const [updates, setUpdates] = useState<Update[]>([]);
+  const [statistics, setStatistics] = useState<Statistics>({
+    eventsConducted: 0,
+    activeMembers: 0,
+    outreachTrips: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const SpaceTalkFullDescription = `Let's travel back 13.8 billion years into the moment everything began!
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-The Physics & Astronomy Club presents Space Talk 2.0, an electrifying deep dive into the birth of the universe - the Big Bang, cosmic explosions, the rise of galaxies, and the mysteries that still leave scientists stunned.
+  const fetchData = async () => {
+    try {
+      const [updatesRes, statsRes] = await Promise.all([
+        fetch("/api/updates"),
+        fetch("/api/statistics"),
+      ]);
 
-If you’ve ever wondered “Where did it all come from?” or “What happened before time existed?” - this is your moment.
+      if (updatesRes.ok) {
+        const updatesData = await updatesRes.json();
+        setUpdates(updatesData.slice(0, 4)); // Show latest 4 updates
+      }
 
-📍 Minor Auditorium, F Block
-🕒 2:00 PM – 5:00 PM
-🗓  30 October 2025`;
-
-  const BloodGoneBadFullDescription = `Blood Gone Bad 2.0 is an exciting campus-wide treasure hunt where participants follow a trail of creative clues hidden across different locations in the college. Each clue unlocks the next location. 
-
-The final clue leads to a special antidote, marking the completion of the challenge.
-
-📍 Whole Campus 
-🕒 12:00 PM – 2:00 PM
-📅  15 October 2025`;
-
-  const OrientationCeremonyFullDescription = `This Orientation Ceremony is created to help you explore the club’s environment, meet the team behind it, and understand the roles you can take up. We share how each member contributes, what we expect from new students, and how joining us can add value to your academic and personal growth.
-
-📍 Minor Auditorium, F Block
-🕒 12:00 PM – 2:00 PM
-📅  10 October 2025`;
-
-  const ISROExhibitionFullDescription = `The Physics & Astronomy Club is organizing an exciting visit to the ISRO Exhibition, where students will explore real satellite models, rocket designs, mission demos, and cutting-edge space technology created by India’s top scientists.
-  
-  This trip offers a rare chance to learn how space missions are planned, how satellites work, and how ISRO continues to push boundaries with innovation. From interactive displays to inspiring research setups, the exhibition will spark curiosity and expand your understanding of space science like never before.
-
-📍 Symbiosis University
-🕒 10:00 AM – 3:00 PM
-📅 23rd August 2025`;
-
-  const updates = [
-    {
-      id: 1,
-      date: "28/10/25",
-      title: "Space Talk 2.0 ",
-      shortDescription: "Space Talk 2.0 is happening on 30/10/25. If you’ve ever wondered “Where did it all come from?” this is your moment.",
-      fullDescription: SpaceTalkFullDescription,
-    },
-    {
-      id: 2,
-      date: "11/10/25",
-      title: "Blood Gone Bad 2.0",
-      shortDescription: "Get ready for Blood Gone Bad 2.0 on 15/10/25. Uncover every hint, clues are all around the campus and secure the antidote that can save you.",
-      fullDescription: BloodGoneBadFullDescription,
-    },
-    {
-      id: 3,
-      date: "08/10/25",
-      title: "Orientation Ceremony",
-      shortDescription: "A warm welcome to our new members as we introduce the club, our goals, and the exciting year ahead.",
-      fullDescription: OrientationCeremonyFullDescription,
-    },
-    {
-      id: 4,
-      date: "20/08/25",
-      title: "ISRO Exhibition",
-      shortDescription: "We’re visiting the ISRO Exhibition at Symbiosis University on 23rd August - a chance to explore space tech.",
-      fullDescription: ISROExhibitionFullDescription,
-    },
-  ];
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStatistics(statsData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const expandedUpdate =
     expandedPanel !== null ? updates.find((u) => u.id === expandedPanel) ?? null : null;
@@ -102,7 +87,12 @@ The final clue leads to a special antidote, marking the completion of the challe
         <h2 className="text-lg sm:text-xl font-semibold text-white px-1">Latest Updates</h2>
         <div className="flex flex-col md:flex-row md:items-stretch gap-6">
           <ul className="flex flex-col md:flex-[2] md:grid md:grid-cols-2 gap-4">
-            {updates.map((update) => (
+            {loading ? (
+              <li className="col-span-2 text-center text-zinc-400 py-8">Loading updates...</li>
+            ) : updates.length === 0 ? (
+              <li className="col-span-2 text-center text-zinc-400 py-8">No updates available</li>
+            ) : (
+              updates.map((update) => (
               <li
                 key={update.id}
                 className="group rounded-xl border border-white/10 bg-white/[0.02] p-4 hover:border-cyan-400/40 active:border-cyan-400/50 transition-colors"
@@ -117,22 +107,29 @@ The final clue leads to a special antidote, marking the completion of the challe
                   Read more →
                 </button>
               </li>
-            ))}
+              ))
+            )}
           </ul>
           <aside className="rounded-xl border border-white/10 bg-white/[0.02] p-4 md:w-80 md:flex md:flex-col">
             <h3 className="text-base font-semibold text-white mb-4 text-center">Club Statistics</h3>
           <div className="space-y-4 md:flex-1 md:flex md:flex-col md:justify-between">
             <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
               <p className="text-xs text-zinc-400 mb-1">Events conducted</p>
-              <p className="text-2xl font-bold text-cyan-300">10+</p>
+              <p className="text-2xl font-bold text-cyan-300">
+                {loading ? "..." : `${statistics.eventsConducted}+`}
+              </p>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
               <p className="text-xs text-zinc-400 mb-1">Active members</p>
-              <p className="text-2xl font-bold text-cyan-300">60+</p>
+              <p className="text-2xl font-bold text-cyan-300">
+                {loading ? "..." : `${statistics.activeMembers}+`}
+              </p>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
               <p className="text-xs text-zinc-400 mb-1">Outreach trips</p>
-              <p className="text-2xl font-bold text-cyan-300">5+</p>
+              <p className="text-2xl font-bold text-cyan-300">
+                {loading ? "..." : `${statistics.outreachTrips}+`}
+              </p>
             </div>
           </div>
         </aside>
@@ -177,7 +174,7 @@ The final clue leads to a special antidote, marking the completion of the challe
                   <h3 className="mt-2 text-xl sm:text-2xl font-bold text-white">{expandedUpdate.title}</h3>
                 </div>
                 <p className="text-sm sm:text-base leading-relaxed text-zinc-300 whitespace-pre-line">
-                  {expandedUpdate.fullDescription}
+                  {expandedUpdate?.fullDescription || expandedUpdate?.shortDescription}
                 </p>
               </div>
             </motion.div>

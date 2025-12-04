@@ -1,1 +1,240 @@
-[]
+[
+  {
+    "src": "/images/gallery/IMG_7347.JPG",
+    "category": "Team",
+    "title": "Club Team Photo",
+    "id": "gallery-1764877722360-0",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7381.JPG",
+    "category": "Team",
+    "title": "Team Council",
+    "id": "gallery-1764877722360-1",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7382.JPG",
+    "category": "Team",
+    "title": "Team Heads",
+    "id": "gallery-1764877722360-2",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7338.JPEG",
+    "category": "Team",
+    "title": "Team Photo Session",
+    "id": "gallery-1764877722360-3",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73422.jpg",
+    "category": "Team",
+    "title": "Randoms",
+    "id": "gallery-1764877722360-4",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73431.jpg",
+    "category": "Team",
+    "title": "Parade",
+    "id": "gallery-1764877722360-5",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_30044.jpg",
+    "category": "Team",
+    "title": "All Members",
+    "id": "gallery-1764877722360-6",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/45666.jpg",
+    "category": "Team",
+    "title": "Spider Man Moment",
+    "id": "gallery-1764877722360-7",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73345.jpg",
+    "category": "Astronomy Night",
+    "title": "Club Gathering",
+    "id": "gallery-1764877722360-8",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7318.JPEG",
+    "category": "Astronomy Night",
+    "title": "Moon Clicked",
+    "id": "gallery-1764877722360-9",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7319.JPEG",
+    "category": "Astronomy Night",
+    "title": "Astronomy Night",
+    "id": "gallery-1764877722360-10",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_2997.JPEG",
+    "category": "Astronomy Night",
+    "title": "Night Events",
+    "id": "gallery-1764877722360-11",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_2998.JPEG",
+    "category": "Astronomy Night",
+    "title": "Telescope Observation",
+    "id": "gallery-1764877722360-12",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_4482.jpg",
+    "category": "Astronomy Night",
+    "title": "Telescope Observation",
+    "id": "gallery-1764877722360-13",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7315.JPEG",
+    "category": "Astronomy Night",
+    "title": "Telescope Observation",
+    "id": "gallery-1764877722360-14",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7331.JPEG",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-15",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_74322.jpg",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-16",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_31755.jpg",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-17",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7329.JPG",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-18",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/123.jpg",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-19",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/55.jpg",
+    "category": "Outreach Visits",
+    "title": "Outreach",
+    "id": "gallery-1764877722360-20",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73222.jpg",
+    "category": "Observations",
+    "title": "Showcasing Project",
+    "id": "gallery-1764877722360-21",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_32100.jpg",
+    "category": "Observations",
+    "title": "Agriculture Drone",
+    "id": "gallery-1764877722360-22",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_44811.jpg",
+    "category": "Observations",
+    "title": "Satellite Model",
+    "id": "gallery-1764877722360-23",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_44800.jpg",
+    "category": "Observations",
+    "title": "Rocket Model",
+    "id": "gallery-1764877722360-24",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_74311.jpg",
+    "category": "Observations",
+    "title": "GSLV Model",
+    "id": "gallery-1764877722360-25",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7324.JPEG",
+    "category": "Events",
+    "title": "Workshop on Innovative Solution",
+    "id": "gallery-1764877722360-26",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7330.JPEG",
+    "category": "Events",
+    "title": "Galaxies and Black Holes",
+    "id": "gallery-1764877722360-27",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7337.JPEG",
+    "category": "Events",
+    "title": "The Big Bang Theory",
+    "id": "gallery-1764877722360-28",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73355.jpg",
+    "category": "Events",
+    "title": "Event Discussions",
+    "id": "gallery-1764877722360-29",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73133.jpg",
+    "category": "Events",
+    "title": "Tambola Tales of Science",
+    "id": "gallery-1764877722360-30",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_7336.JPEG",
+    "category": "Events",
+    "title": "Space Talk 2.0",
+    "id": "gallery-1764877722360-31",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73255.jpg",
+    "category": "Events",
+    "title": "Orientation Ceremony",
+    "id": "gallery-1764877722360-32",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  },
+  {
+    "src": "/images/gallery/IMG_73277.jpg",
+    "category": "Events",
+    "title": "Space Talk",
+    "id": "gallery-1764877722360-33",
+    "createdAt": "2025-12-04T19:48:42.360Z"
+  }
+]
