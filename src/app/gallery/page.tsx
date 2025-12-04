@@ -313,7 +313,6 @@ const galleryImages = [
 ];
 
 export default function GalleryPage() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [selectedImage, setSelectedImage] = useState<(typeof galleryImages[0] & { description?: string }) | null>(null);
@@ -321,11 +320,6 @@ export default function GalleryPage() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState<Record<string, boolean>>({});
   const [canScrollRight, setCanScrollRight] = useState<Record<string, boolean>>({});
-
-  const filteredImages =
-    selectedCategory === "All"
-      ? galleryImages
-      : galleryImages.filter((img) => img.category === selectedCategory);
 
   // Memoize filtered images for expanded modal
   const expandedCategoryImages = useMemo(
@@ -496,7 +490,7 @@ export default function GalleryPage() {
               
               {/* Content Overlay with Slide Animation */}
               <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 sm:p-12 pb-10 sm:pb-14 text-white">
-                <div className="max-w-2xl transform transition-all duration-700 group-hover:translate-y-0">
+                <div className="max-w-2xl transform transition-all duration-700 group-hover:translate-y-0 hidden md:block">
                   <div
                     key={featuredIndex}
                     className="animate-slide-up-fade"
@@ -559,49 +553,6 @@ export default function GalleryPage() {
               </button>
 
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Filter */}
-      <section className="px-4 mb-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => {
-                  setSelectedCategory(category);
-                  setFeaturedIndex(0);
-                  setIsAutoPlaying(true);
-                  
-                  // Scroll to the category section if not "All"
-                  if (category !== "All") {
-                    setTimeout(() => {
-                      const sectionId = `category-section-${category}`;
-                      const section = document.getElementById(sectionId);
-                      if (section) {
-                        section.scrollIntoView({ 
-                          behavior: "smooth", 
-                          block: "start",
-                          inline: "nearest"
-                        });
-                      }
-                    }, 100);
-                  }
-                }}
-                className={`group relative overflow-hidden rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ${
-                  selectedCategory === category
-                    ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-900/50 scale-110"
-                    : "border border-indigo-500/30 bg-indigo-500/10 text-indigo-200 hover:border-indigo-400/60 hover:bg-indigo-500/20 hover:scale-105"
-                }`}
-              >
-                <span className="relative z-10">{category}</span>
-                {selectedCategory === category && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 animate-shimmer" />
-                )}
-              </button>
-            ))}
           </div>
         </div>
       </section>
