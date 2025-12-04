@@ -63,8 +63,16 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
