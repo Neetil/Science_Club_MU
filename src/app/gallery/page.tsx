@@ -304,7 +304,7 @@ export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<typeof galleryImages[0] | null>(null);
+  const [selectedImage, setSelectedImage] = useState<(typeof galleryImages[0] & { description?: string }) | null>(null);
   const [scrollPositions, setScrollPositions] = useState<Record<string, number>>({});
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState<Record<string, boolean>>({});
@@ -901,8 +901,8 @@ export default function GalleryPage() {
                     )}
                   </div>
                   <h3 className="text-3xl font-bold text-white mb-2">{selectedImage.title}</h3>
-                  {(selectedImage as any).description && (
-                    <p className="text-zinc-300">{(selectedImage as any).description}</p>
+                  {selectedImage.description && (
+                    <p className="text-zinc-300">{selectedImage.description}</p>
                   )}
                 </div>
               </div>
