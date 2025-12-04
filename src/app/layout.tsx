@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ClientBody } from "./ClientBody";
+import { Navigation } from "./Navigation";
 
 export const metadata: Metadata = {
   title: "Physics & Astronomy Club | Medicaps University",
@@ -19,38 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-dvh bg-[#0a0d14] text-zinc-200 antialiased font-sans">
         <ClientBody>
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <header className="sticky top-0 z-50">
-              <nav className="flex h-16 items-center justify-between rounded-2xl backdrop-blur-md supports-[backdrop-filter]:bg-black/40 bg-black/30 border border-white/10 shadow-lg shadow-black/20 px-4 sm:px-6">
-                <Link href="/" className="group inline-flex items-baseline gap-2">
-                  <span className="text-lg font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">
-                    Physics & Astronomy Club
-                  </span>
-                  <span className="hidden sm:inline text-xs text-zinc-400">Medicaps University</span>
-                </Link>
-                <ul className="flex items-center gap-4 text-sm">
-                  {[
-                    ["Home", "/"],
-                    ["About", "/about"],
-                    ["Events", "/events"],
-                    ["Gallery", "/gallery"],
-                    ["Team", "/team"],
-                    ["Contact", "/contact"],
-                  ].map(([label, href]) => (
-                    <li key={href as string}>
-                      <Link
-                        href={href as string}
-                        className="relative rounded px-3 py-2 text-zinc-300 hover:text-white transition-colors"
-                      >
-                        {label}
-                        <span className="absolute inset-x-2 -bottom-[2px] h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </header>
-            <main className="relative py-8">
+          <div className="relative mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
+            <Navigation />
+            <main className="relative py-4 sm:py-6 md:py-8">
               {/* Page transition wrapper */}
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 {children}
