@@ -320,6 +320,8 @@ export default function GalleryPage() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState<Record<string, boolean>>({});
   const [canScrollRight, setCanScrollRight] = useState<Record<string, boolean>>({});
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Memoize filtered images for expanded modal
   const expandedCategoryImages = useMemo(
@@ -348,6 +350,34 @@ export default function GalleryPage() {
     }, 5000);
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
+
+  // Touch swipe handlers
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setFeaturedIndex((prev) => (prev + 1) % heroImages.length);
+      setIsAutoPlaying(false);
+    }
+    if (isRightSwipe) {
+      setFeaturedIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+      setIsAutoPlaying(false);
+    }
+  };
 
   // Check initial scroll positions for all categories
   useEffect(() => {
@@ -454,7 +484,12 @@ export default function GalleryPage() {
       <section className="px-4 mb-16">
         <div className="max-w-7xl mx-auto">
           <div className="relative group rounded-3xl overflow-hidden border border-indigo-500/30 bg-indigo-950/40 backdrop-blur-sm shadow-2xl hover:shadow-indigo-900/50 transition-all duration-700">
-            <div className="relative aspect-[16/9] overflow-hidden">
+            <div 
+              className="relative aspect-[16/9] overflow-hidden touch-pan-y"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               {/* Animated Background Layers */}
               <div className="absolute inset-0">
                 {heroImages.map((img, index) => (
@@ -508,7 +543,7 @@ export default function GalleryPage() {
 
 
               {/* Navigation Dots with Enhanced Animation */}
-              <div className="absolute bottom-8 right-8 z-30 flex gap-2 backdrop-blur-md bg-black/20 rounded-full px-3 py-2">
+              <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-30 flex gap-1.5 md:gap-2 backdrop-blur-md bg-black/20 rounded-full px-2 py-1.5 md:px-3 md:py-2">
                 {heroImages.map((_, index) => (
                   <button
                     key={index}
@@ -516,10 +551,10 @@ export default function GalleryPage() {
                       setFeaturedIndex(index);
                       setIsAutoPlaying(false);
                     }}
-                    className={`h-2 rounded-full transition-all duration-500 relative ${
+                    className={`h-1.5 w-1.5 md:h-2 md:w-2 rounded-full transition-all duration-500 relative touch-manipulation ${
                       index === featuredIndex
-                        ? "w-8 bg-indigo-400 shadow-lg shadow-indigo-400/50"
-                        : "w-2 bg-indigo-400/40 hover:bg-indigo-400/60 hover:scale-125"
+                        ? "md:w-8 w-6 bg-indigo-400 shadow-lg shadow-indigo-400/50"
+                        : "bg-indigo-400/40 hover:bg-indigo-400/60 hover:scale-125"
                     }`}
                     aria-label={`Go to image ${index + 1}`}
                   />
@@ -532,10 +567,10 @@ export default function GalleryPage() {
                   setFeaturedIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
                   setIsAutoPlaying(false);
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600/90 backdrop-blur-md text-white shadow-2xl shadow-indigo-900/50 transition-all hover:bg-indigo-500 hover:scale-125 hover:shadow-indigo-400/50 opacity-0 group-hover:opacity-100 hover:rotate-[-5deg]"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-indigo-600/90 backdrop-blur-md text-white shadow-2xl shadow-indigo-900/50 transition-all hover:bg-indigo-500 hover:scale-125 hover:shadow-indigo-400/50 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:rotate-[-5deg] touch-manipulation"
                 aria-label="Previous"
               >
-                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -544,10 +579,10 @@ export default function GalleryPage() {
                   setFeaturedIndex((prev) => (prev + 1) % heroImages.length);
                   setIsAutoPlaying(false);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600/90 backdrop-blur-md text-white shadow-2xl shadow-indigo-900/50 transition-all hover:bg-indigo-500 hover:scale-125 hover:shadow-indigo-400/50 opacity-0 group-hover:opacity-100 hover:rotate-[5deg]"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-indigo-600/90 backdrop-blur-md text-white shadow-2xl shadow-indigo-900/50 transition-all hover:bg-indigo-500 hover:scale-125 hover:shadow-indigo-400/50 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:rotate-[5deg] touch-manipulation"
                 aria-label="Next"
               >
-                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
