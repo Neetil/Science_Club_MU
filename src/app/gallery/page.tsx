@@ -197,6 +197,12 @@ const galleryImages = [
     title: "Outreach",
   },
   {
+    id: 40,
+    src: "/images/gallery/IMG_74322.jpg",
+    category: "Outreach Visits",
+    title: "Outreach",
+  },
+  {
     id: 23,
     src: "/images/gallery/IMG_31755.jpg",
     category: "Outreach Visits",
@@ -245,6 +251,12 @@ const galleryImages = [
     src: "/images/gallery/IMG_44800.jpg",
     category: "Observations",
     title: "Rocket Model",
+  },
+  {
+    id: 41,
+    src: "/images/gallery/IMG_74311.jpg",
+    category: "Observations",
+    title: "GSLV Model",
   },
 
   // Events
@@ -694,7 +706,9 @@ export default function GalleryPage() {
                             src={image.src}
                             alt={image.title}
                             loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className={`h-full w-full transition-transform duration-700 group-hover:scale-105 ${
+                              image.id === 40 ? 'object-contain' : 'object-cover'
+                            }`}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.src = `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=800&fit=crop`;
@@ -769,7 +783,9 @@ export default function GalleryPage() {
                         src={image.src}
                         alt={image.title}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className={`h-full w-full transition-transform duration-300 group-hover:scale-105 ${
+                          image.id === 40 || image.id === 41 ? 'object-contain' : 'object-cover'
+                        }`}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=800&fit=crop`;
