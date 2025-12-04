@@ -108,11 +108,13 @@ export async function POST(request: NextRequest) {
 }
 
 type Submission = {
+  id: string;
   name: string;
   email: string;
   subject: string;
   message: string;
   ip: string;
+  read: boolean;
   createdAt: string;
 };
 
