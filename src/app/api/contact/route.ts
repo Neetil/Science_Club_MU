@@ -166,7 +166,7 @@ async function sendNotificationEmail({
   email,
   subject,
   message,
-}: Omit<Submission, "ip" | "createdAt">) {
+}: Omit<Submission, "id" | "ip" | "read" | "createdAt">) {
   const resendApiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_EMAIL ?? "science.club@medicaps.ac.in";
   // Resend requires verified domain - use onboarding@resend.dev for testing or your verified domain
