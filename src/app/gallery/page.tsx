@@ -194,31 +194,31 @@ const galleryImages = [
     id: 8,
     src: "/images/gallery/IMG_7331.JPEG",
     category: "Outreach Visits",
-    title: "Team Gathering",
+    title: "Outreach",
   },
   {
     id: 23,
     src: "/images/gallery/IMG_31755.jpg",
     category: "Outreach Visits",
-    title: "Night Sky Photography",
+    title: "Outreach",
   },
   {
     id: 29,
     src: "/images/gallery/IMG_7329.JPG",
     category: "Outreach Visits",
-    title: "Event Session",
+    title: "Outreach",
   },
   {
     id: 31,
     src: "/images/gallery/123.jpg",
     category: "Outreach Visits",
-    title: "Event Photo",
+    title: "Outreach",
   },
   {
     id: 32,
     src: "/images/gallery/55.jpg",
     category: "Outreach Visits",
-    title: "Club Event",
+    title: "Outreach",
   },
 
   // Observations
