@@ -63,11 +63,13 @@ export async function POST(request: NextRequest) {
 
     // Try to save submission (non-blocking - file system is read-only on Vercel)
     saveSubmission({
+      id: Date.now().toString(),
       name,
       email,
       subject,
       message,
       ip,
+      read: false,
       createdAt: new Date().toISOString(),
     }).catch((error) => {
       // File saving fails on Vercel (read-only file system) - that's okay

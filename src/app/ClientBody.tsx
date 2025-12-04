@@ -52,40 +52,35 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading) return;
-    const start = performance.now();
-    let frameId = 0;
+    
+    const DURATION = 6000; // 6 seconds
+    const UPDATE_INTERVAL = 16; // ~60fps for smooth animation
+    const STEPS = DURATION / UPDATE_INTERVAL; // ~375 steps
+    const INCREMENT = 1 / STEPS; // Progress increment per step
+    
+    let currentProgress = 0;
     let intervalId: number | null = null;
 
-    const updateProgress = () => {
-      const elapsed = performance.now() - start;
-      const next = Math.min(elapsed / 6000, 1);
-      setProgress(next);
-      return next;
-    };
+    // Start progress immediately
+    setProgress(0);
 
-    const animate = () => {
-      const next = updateProgress();
-      if (next < 1) {
-        frameId = requestAnimationFrame(animate);
-      }
-    };
-
-    frameId = requestAnimationFrame(animate);
-
-    // Fallback updates while the tab is hidden (rAF pauses when not visible)
     intervalId = window.setInterval(() => {
-      if (document.visibilityState === "visible") return;
-      const next = updateProgress();
-      if (next >= 1 && intervalId !== null) {
-        window.clearInterval(intervalId);
-        intervalId = null;
+      currentProgress += INCREMENT;
+      const next = Math.min(currentProgress, 1);
+      setProgress(next);
+      
+      if (next >= 1) {
+        if (intervalId !== null) {
+          window.clearInterval(intervalId);
+          intervalId = null;
+        }
       }
-    }, 250);
+    }, UPDATE_INTERVAL);
 
     return () => {
-      cancelAnimationFrame(frameId);
       if (intervalId !== null) {
         window.clearInterval(intervalId);
+        intervalId = null;
       }
     };
   }, [isLoading]);
@@ -149,8 +144,8 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       {isLoading && <LaunchOverlay progress={progress} />}
       <div
         className={cn(
-          "relative transition-opacity duration-700 ease-out",
-          isLoading ? "pointer-events-none opacity-0" : "opacity-100",
+          "relative transition-opacity duration-300 ease-out",
+          isLoading ? "pointer-events-none opacity-0 invisible" : "opacity-100 visible",
         )}
       >
         {children}
@@ -185,7 +180,7 @@ function LaunchOverlay({ progress }: { progress: number }) {
 
         <div className="h-1.5 w-48 overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-300 to-cyan-500 transition-[width] duration-200 ease-out"
+            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-300 to-cyan-500 transition-none"
             style={{ width: `${clamped * 100}%` }}
           />
         </div>
