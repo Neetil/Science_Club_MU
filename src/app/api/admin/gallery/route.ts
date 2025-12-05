@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       src: body.src,
       category: body.category,
       title: body.title,
-      description: body.description,
+      description: null,
     });
 
     return NextResponse.json(newImage);
@@ -42,7 +42,7 @@ export async function PUT(request: NextRequest) {
       src: body.src,
       category: body.category,
       title: body.title,
-      description: body.description,
+      description: null,
     });
 
     return NextResponse.json(updated);

@@ -134,21 +134,82 @@ function ImageForm({
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState({
-    src: image?.src || "",
     title: image?.title || "",
     category: image?.category || "",
-    description: image?.description || "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(image?.src || "");
+  const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleFileSelect = (file: File) => {
+    if (file && file.type.startsWith("image/")) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid image file");
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate image is present for new uploads
+    if (!image && !imagePreview) {
+      alert("Please select an image");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      let imageSrc = imagePreview;
+
+      // If a new file is selected, convert to base64
+      if (imageFile) {
+        const reader = new FileReader();
+        imageSrc = await new Promise<string>((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imageFile);
+        });
+      }
+
       const url = "/api/admin/gallery";
       const method = image ? "PUT" : "POST";
-      const body = image ? { ...formData, id: image.id } : formData;
+      const body = image
+        ? { ...formData, src: imageSrc, id: image.id }
+        : { ...formData, src: imageSrc };
 
       const res = await fetch(url, {
         method,
@@ -184,25 +245,79 @@ function ImageForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Image URL *
+              Image *
             </label>
-            <input
-              type="url"
-              required
-              value={formData.src}
-              onChange={(e) => setFormData({ ...formData, src: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-            />
-            {formData.src && (
-              <img
-                src={formData.src}
-                alt="Preview"
-                className="mt-2 w-full h-48 object-cover rounded-lg"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-            )}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                isDragging
+                  ? "border-cyan-500 bg-cyan-500/10"
+                  : "border-white/20 bg-white/5 hover:border-white/30"
+              }`}
+            >
+              {imagePreview ? (
+                <div className="space-y-4">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-64 object-contain rounded-lg mx-auto"
+                  />
+                  <div className="flex gap-2 justify-center">
+                    <label className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 cursor-pointer transition-colors text-sm">
+                      Change Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileInput}
+                        className="hidden"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview("");
+                        setImageFile(null);
+                      }}
+                      className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center">
+                    <svg
+                      className="w-12 h-12 text-zinc-400 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <p className="text-zinc-300 mb-2">
+                      Drag and drop an image here, or click to select
+                    </p>
+                    <label className="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 cursor-pointer transition-colors text-sm inline-block">
+                      Select Image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileInput}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
@@ -234,20 +349,7 @@ function ImageForm({
               <option value="Outreach Visits">Outreach Visits</option>
               <option value="Observations">Observations</option>
               <option value="Events">Events</option>
-              <option value="Workshops">Workshops</option>
             </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Description
-            </label>
-            <textarea
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-            />
           </div>
 
           <div className="flex gap-3 pt-4">
