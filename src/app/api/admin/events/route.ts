@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       description: body.description,
       category: body.category,
       eventType: body.eventType || "upcoming",
+      image: null,
       published: body.published ?? false,
     });
 
