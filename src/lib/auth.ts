@@ -1,9 +1,16 @@
 import { cookies } from "next/headers";
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+// Require environment variables - no defaults for security
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function verifyCredentials(username: string, password: string): Promise<boolean> {
+  // Validate that credentials are configured
+  if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+    console.error("Admin credentials not configured. Please set ADMIN_USERNAME and ADMIN_PASSWORD environment variables.");
+    return false;
+  }
+  
   return username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
 }
 
