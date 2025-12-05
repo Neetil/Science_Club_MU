@@ -6,13 +6,10 @@ export function middleware(request: NextRequest) {
   const authCookie = request.cookies.get("admin-auth");
   const isAuthenticated = authCookie?.value === "authenticated";
 
-  // Allow access to login page
+  // Allow access to login page - always show login, never auto-redirect
   if (pathname === "/admin/login") {
-    // If already authenticated, redirect to dashboard
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-    // Add header to indicate this is the login page
+    // Always show login page, even if authenticated
+    // User must enter credentials every time
     const response = NextResponse.next();
     response.headers.set("x-is-login-page", "true");
     return response;
