@@ -18,6 +18,23 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    // Validate required fields
+    if (!body.title || !body.category || !body.src) {
+      return NextResponse.json(
+        { error: "Title, category, and image are required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if base64 string is too large (PostgreSQL TEXT can handle large strings, but we check anyway)
+    if (body.src.length > 10000000) {
+      return NextResponse.json(
+        { error: "Image is too large. Please compress it before uploading." },
+        { status: 400 }
+      );
+    }
+
     const newImage = await createGalleryImage({
       src: body.src,
       category: body.category,
@@ -27,7 +44,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newImage);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to add image" }, { status: 500 });
+    console.error("Error creating gallery image:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to add image";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -38,6 +58,27 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    if (!body.id) {
+      return NextResponse.json({ error: "Image ID is required" }, { status: 400 });
+    }
+
+    // Validate required fields
+    if (!body.title || !body.category || !body.src) {
+      return NextResponse.json(
+        { error: "Title, category, and image are required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if base64 string is too large
+    if (body.src.length > 10000000) {
+      return NextResponse.json(
+        { error: "Image is too large. Please compress it before uploading." },
+        { status: 400 }
+      );
+    }
+
     const updated = await updateGalleryImage(body.id, {
       src: body.src,
       category: body.category,
@@ -47,10 +88,13 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updated);
   } catch (error) {
+    console.error("Error updating gallery image:", error);
     if ((error as { code?: string }).code === "P2025") {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
-    return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update image";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
