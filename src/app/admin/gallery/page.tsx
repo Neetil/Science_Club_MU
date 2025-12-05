@@ -141,17 +141,98 @@ function ImageForm({
   const [imagePreview, setImagePreview] = useState<string>(image?.src || "");
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const handleFileSelect = (file: File) => {
-    if (file && file.type.startsWith("image/")) {
-      setImageFile(file);
+  // Compress image before uploading
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions (max 1920px on longest side)
+          const maxDimension = 1920;
+          if (width > height) {
+            if (width > maxDimension) {
+              height = (height / width) * maxDimension;
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width = (width / height) * maxDimension;
+              height = maxDimension;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Could not get canvas context"));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to base64 with quality compression (0.8 = 80% quality)
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error("Failed to compress image"));
+                return;
+              }
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            },
+            "image/jpeg",
+            0.8
+          );
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
       };
+      reader.onerror = reject;
       reader.readAsDataURL(file);
-    } else {
-      alert("Please select a valid image file");
+    });
+  };
+
+  const handleFileSelect = async (file: File) => {
+    setError("");
+    
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (max 10MB before compression)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError("Image is large and will be compressed automatically.");
+    }
+
+    try {
+      setCompressing(true);
+      setImageFile(file);
+      // Compress and preview
+      const compressedBase64 = await compressImage(file);
+      setImagePreview(compressedBase64);
+      setError(""); // Clear any previous errors
+    } catch (err) {
+      console.error("Error processing image:", err);
+      setError("Failed to process image. Please try another image.");
+      setImageFile(null);
+      setImagePreview("");
+    } finally {
+      setCompressing(false);
     }
   };
 
@@ -183,26 +264,37 @@ function ImageForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     // Validate image is present for new uploads
     if (!image && !imagePreview) {
-      alert("Please select an image");
+      setError("Please select an image");
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.title.trim()) {
+      setError("Please enter a title");
+      return;
+    }
+
+    if (!formData.category) {
+      setError("Please select a category");
       return;
     }
 
     setLoading(true);
 
     try {
-      let imageSrc = imagePreview;
+      // Use the already compressed preview image
+      const imageSrc = imagePreview;
 
-      // If a new file is selected, convert to base64
-      if (imageFile) {
-        const reader = new FileReader();
-        imageSrc = await new Promise<string>((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(imageFile);
-        });
+      // Check if base64 string is too large (Next.js has ~4.5MB body limit)
+      // Base64 is ~33% larger than original, so we check for ~3MB base64 string
+      if (imageSrc.length > 4000000) {
+        setError("Image is still too large after compression. Please try a smaller image or lower resolution.");
+        setLoading(false);
+        return;
       }
 
       const url = "/api/admin/gallery";
@@ -217,14 +309,18 @@ function ImageForm({
         body: JSON.stringify(body),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         onSuccess();
       } else {
-        alert("Failed to save image");
+        const errorMessage = data.error || "Failed to save image";
+        setError(errorMessage);
+        console.error("API Error:", data);
       }
     } catch (error) {
       console.error("Error saving image:", error);
-      alert("Failed to save image");
+      setError("Failed to save image. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -243,6 +339,12 @@ function ImageForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
               Image *
@@ -257,7 +359,12 @@ function ImageForm({
                   : "border-white/20 bg-white/5 hover:border-white/30"
               }`}
             >
-              {imagePreview ? (
+              {compressing ? (
+                <div className="flex flex-col items-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mb-4"></div>
+                  <p className="text-zinc-300">Compressing image...</p>
+                </div>
+              ) : imagePreview ? (
                 <div className="space-y-4">
                   <img
                     src={imagePreview}
@@ -272,6 +379,7 @@ function ImageForm({
                         accept="image/*"
                         onChange={handleFileInput}
                         className="hidden"
+                        disabled={compressing}
                       />
                     </label>
                     <button
@@ -279,8 +387,10 @@ function ImageForm({
                       onClick={() => {
                         setImagePreview("");
                         setImageFile(null);
+                        setError("");
                       }}
                       className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-sm"
+                      disabled={compressing}
                     >
                       Remove
                     </button>
@@ -305,6 +415,9 @@ function ImageForm({
                     <p className="text-zinc-300 mb-2">
                       Drag and drop an image here, or click to select
                     </p>
+                    <p className="text-zinc-500 text-xs mb-2">
+                      Max 10MB • Images are automatically compressed
+                    </p>
                     <label className="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 cursor-pointer transition-colors text-sm inline-block">
                       Select Image
                       <input
@@ -312,6 +425,7 @@ function ImageForm({
                         accept="image/*"
                         onChange={handleFileInput}
                         className="hidden"
+                        disabled={compressing}
                       />
                     </label>
                   </div>
