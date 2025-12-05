@@ -21,10 +21,8 @@ export async function POST(request: NextRequest) {
     const newEvent = await createEvent({
       title: body.title,
       description: body.description,
-      date: body.date,
-      time: body.time,
-      location: body.location,
       category: body.category,
+      eventType: body.eventType || "upcoming",
       image: body.image,
       published: body.published ?? false,
     });
@@ -45,10 +43,8 @@ export async function PUT(request: NextRequest) {
     const updated = await updateEvent(body.id, {
       title: body.title,
       description: body.description,
-      date: body.date,
-      time: body.time,
-      location: body.location,
       category: body.category,
+      eventType: body.eventType,
       image: body.image,
       published: body.published,
     });
