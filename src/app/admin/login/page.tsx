@@ -9,11 +9,13 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setRemainingAttempts(null);
 
     try {
       const response = await fetch("/api/admin/login", {
@@ -28,7 +30,18 @@ export default function AdminLogin() {
         router.push("/admin");
         router.refresh();
       } else {
-        setError(data.error || "Invalid credentials");
+        // Check for rate limit info
+        const remaining = response.headers.get("X-RateLimit-Remaining");
+        if (remaining !== null) {
+          setRemainingAttempts(parseInt(remaining));
+        }
+
+        // Check if it's a rate limit error
+        if (response.status === 429) {
+          setError(data.error || "Too many login attempts. Please try again later.");
+        } else {
+          setError(data.error || "Invalid credentials");
+        }
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -38,7 +51,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14] px-4">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 shadow-2xl">
           <div className="text-center mb-8">
@@ -50,6 +63,11 @@ export default function AdminLogin() {
             {error && (
               <div className="rounded-lg bg-red-500/10 border border-red-500/50 p-3 text-red-400 text-sm">
                 {error}
+                {remainingAttempts !== null && remainingAttempts >= 0 && (
+                  <p className="mt-1 text-xs">
+                    Remaining attempts: {remainingAttempts}
+                  </p>
+                )}
               </div>
             )}
 
