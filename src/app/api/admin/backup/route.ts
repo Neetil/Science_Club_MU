@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/data";
+import type { Event, GalleryImage, TeamMember, Update, ContactSubmission, Statistics } from "@prisma/client";
 
 /**
  * Export all database data as JSON backup
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
       // Create new events
       if (data.events.length > 0) {
         await prisma.event.createMany({
-          data: data.events.map((e: any) => ({
+          data: data.events.map((e: Event) => ({
             id: e.id,
             title: e.title,
             description: e.description,
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
       await prisma.galleryImage.deleteMany();
       if (data.galleryImages.length > 0) {
         await prisma.galleryImage.createMany({
-          data: data.galleryImages.map((img: any) => ({
+          data: data.galleryImages.map((img: GalleryImage) => ({
             id: img.id,
             src: img.src,
             thumbnail: img.thumbnail || null,
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
       await prisma.teamMember.deleteMany();
       if (data.teamMembers.length > 0) {
         await prisma.teamMember.createMany({
-          data: data.teamMembers.map((member: any) => ({
+          data: data.teamMembers.map((member: TeamMember) => ({
             id: member.id,
             name: member.name,
             role: member.role,
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest) {
       await prisma.update.deleteMany();
       if (data.updates.length > 0) {
         await prisma.update.createMany({
-          data: data.updates.map((update: any) => ({
+          data: data.updates.map((update: Update) => ({
             id: update.id,
             date: update.date,
             title: update.title,
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest) {
       await prisma.contactSubmission.deleteMany();
       if (data.contactSubmissions.length > 0) {
         await prisma.contactSubmission.createMany({
-          data: data.contactSubmissions.map((sub: any) => ({
+          data: data.contactSubmissions.map((sub: ContactSubmission) => ({
             id: sub.id,
             name: sub.name,
             email: sub.email,
