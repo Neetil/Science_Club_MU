@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { GalleryImageSkeleton, Skeleton } from "@/components/Skeleton";
 
 const categories = ["All", "Team", "Astronomy Night", "Outreach Visits", "Observations", "Events", "Workshops"];
 
@@ -431,15 +432,12 @@ export default function GalleryPage() {
               return (
                 <div key={category} className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="h-8 w-32 bg-zinc-800/50 rounded animate-pulse" />
-                    <div className="h-5 w-20 bg-zinc-800/50 rounded animate-pulse" />
+                    <Skeleton variant="text" width={128} height={32} />
+                    <Skeleton variant="text" width={80} height={20} />
                   </div>
                   <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4">
                     {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex-shrink-0 w-64 md:w-72 aspect-[3/2] rounded-2xl bg-zinc-800/50 animate-pulse"
-                      />
+                      <GalleryImageSkeleton key={i} />
                     ))}
                   </div>
                 </div>

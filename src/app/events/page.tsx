@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { EventCardSkeleton } from "@/components/Skeleton";
 
 interface Event {
   id: string;
@@ -140,8 +141,10 @@ export default function EventsPage() {
               </div>
 
               {loading ? (
-                <div className="text-center py-12 text-zinc-400">
-                  <p>Loading events...</p>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {[...Array(6)].map((_, i) => (
+                    <EventCardSkeleton key={i} />
+                  ))}
                 </div>
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -201,8 +204,10 @@ export default function EventsPage() {
             </div>
 
             {loading ? (
-              <div className="text-center py-12 text-zinc-400">
-                <p>Loading events...</p>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {[...Array(6)].map((_, i) => (
+                  <EventCardSkeleton key={i} />
+                ))}
               </div>
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

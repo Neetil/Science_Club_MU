@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { TeamCardSkeleton } from "@/components/Skeleton";
 
 interface TeamMember {
   id: string;
@@ -50,9 +51,42 @@ export default function TeamPage() {
             this team.
           </p>
         </header>
-        <div className="text-center py-12 text-zinc-400">
-          <p>Loading team members...</p>
-        </div>
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+            <p className="text-sm uppercase tracking-[0.4em] text-indigo-200">Mentors</p>
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <TeamCardSkeleton key={i} />
+            ))}
+          </div>
+        </section>
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
+            <p className="text-sm uppercase tracking-[0.4em] text-blue-200">Command</p>
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <TeamCardSkeleton key={i} />
+            ))}
+          </div>
+        </section>
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent" />
+            <p className="text-sm uppercase tracking-[0.4em] text-indigo-200">Mission Control</p>
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <TeamCardSkeleton key={i} />
+            ))}
+          </div>
+        </section>
       </div>
     );
   }
