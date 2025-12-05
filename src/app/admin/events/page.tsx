@@ -244,7 +244,6 @@ function EventForm({
     description: event?.description || "",
     category: event?.category || "",
     eventType: (event?.eventType as "upcoming" | "past") || "upcoming",
-    image: event?.image || "",
     published: event?.published ?? false,
   });
   const [loading, setLoading] = useState(false);
@@ -352,18 +351,6 @@ function EventForm({
               <option value="upcoming">Upcoming Event</option>
               <option value="past">Past Event</option>
             </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-            />
           </div>
 
           <div className="flex items-center gap-2">
