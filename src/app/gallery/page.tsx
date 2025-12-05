@@ -120,6 +120,7 @@ export default function GalleryPage() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [galleryImagesState, setGalleryImagesState] = useState<GalleryImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch gallery data
   useEffect(() => {
@@ -128,6 +129,7 @@ export default function GalleryPage() {
 
   const fetchGalleryData = async () => {
     try {
+      setIsLoading(true);
       const galleryRes = await fetch("/api/gallery");
 
       if (galleryRes.ok) {
@@ -136,6 +138,8 @@ export default function GalleryPage() {
       }
     } catch (error) {
       console.error("Failed to fetch gallery data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -418,7 +422,28 @@ export default function GalleryPage() {
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative max-w-7xl mx-auto space-y-12">
           {categories.slice(1).map((category) => {
-            const categoryImages = galleryImages.filter((img) => img.category === category);
+            const categoryImages = isLoading ? [] : galleryImages.filter((img) => img.category === category);
+            
+            // Show skeleton loader while loading
+            if (isLoading) {
+              return (
+                <div key={category} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="h-8 w-32 bg-zinc-800/50 rounded animate-pulse" />
+                    <div className="h-5 w-20 bg-zinc-800/50 rounded animate-pulse" />
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-64 md:w-72 aspect-[3/2] rounded-2xl bg-zinc-800/50 animate-pulse"
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            
             if (categoryImages.length === 0) return null;
 
             const scrollContainerId = `scroll-${category}`;
@@ -501,22 +526,32 @@ export default function GalleryPage() {
                       checkScrollPosition(container);
                     }}
                   >
-                    {categoryImages.map((image) => (
+                    {categoryImages.map((image, index) => (
                       <div
                         key={image.id}
                         className="group relative flex-shrink-0 w-64 md:w-72 snap-start cursor-pointer"
                         onClick={() => setSelectedImage(image)}
                       >
                         <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-indigo-500/20 bg-indigo-950/40 transition-all duration-500 hover:border-indigo-400/60 hover:shadow-2xl hover:shadow-indigo-900/30 hover:scale-[1.02]">
+                          {/* Skeleton loader for individual images */}
+                          <div className="absolute inset-0 bg-zinc-800/30 animate-pulse" />
                           <img
                             src={image.src}
                             alt={image.title}
-                            loading="lazy"
+                            loading={index < 6 ? "eager" : "lazy"}
+                            decoding="async"
                             className={`h-full w-full transition-transform duration-700 group-hover:scale-105 ${
                               image.id === 40 ? 'object-contain' : 'object-cover'
                             }`}
+                            onLoad={(e) => {
+                              // Hide skeleton when image loads
+                              const skeleton = e.currentTarget.previousElementSibling as HTMLElement;
+                              if (skeleton) skeleton.style.display = 'none';
+                            }}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
+                              const skeleton = target.previousElementSibling as HTMLElement;
+                              if (skeleton) skeleton.style.display = 'none';
                               target.src = `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=800&fit=crop`;
                             }}
                           />
