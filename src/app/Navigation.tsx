@@ -46,6 +46,22 @@ export function Navigation() {
               </Link>
             </li>
           ))}
+          {/* Admin Link */}
+          <li>
+            <Link
+              href="/admin/login"
+              className={`relative rounded px-3 py-2 transition-colors ${
+                pathname?.startsWith("/admin")
+                  ? "text-white"
+                  : "text-zinc-300 hover:text-white"
+              }`}
+            >
+              Admin
+              {pathname?.startsWith("/admin") && (
+                <span className="absolute inset-x-2 -bottom-[2px] h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
+              )}
+            </Link>
+          </li>
         </ul>
 
         {/* Mobile Menu Button */}
@@ -97,6 +113,20 @@ export function Navigation() {
               </Link>
             </li>
           ))}
+          {/* Admin Link for Mobile */}
+          <li>
+            <Link
+              href="/admin/login"
+              onClick={() => setIsOpen(false)}
+              className={`block px-4 py-3 rounded-lg text-base transition-colors touch-manipulation ${
+                pathname?.startsWith("/admin")
+                  ? "bg-cyan-500/20 text-cyan-200"
+                  : "text-zinc-300 hover:bg-white/5 active:bg-white/10 hover:text-white"
+              }`}
+            >
+              Admin
+            </Link>
+          </li>
         </ul>
       </div>
 
