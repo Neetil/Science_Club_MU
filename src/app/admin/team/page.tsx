@@ -163,13 +163,16 @@ function MemberForm({
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    role: string;
+    focus: string;
+    category: TeamMember["category"];
+  }>({
     name: member?.name || "",
     role: member?.role || "",
     focus: member?.focus || "",
     category: member?.category || "executive",
-    image: member?.image || "",
-    order: member?.order || 0,
   });
   const [loading, setLoading] = useState(false);
 
@@ -242,7 +245,7 @@ function MemberForm({
 
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Focus/Description *
+              Description *
             </label>
             <textarea
               required
@@ -263,34 +266,10 @@ function MemberForm({
               onChange={(e) => setFormData({ ...formData, category: e.target.value as TeamMember["category"] })}
               className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
             >
-              <option value="executive">Executive</option>
-              <option value="coordinator">Coordinator</option>
-              <option value="mentor">Mentor</option>
+              <option value="mentor">Mentors</option>
+              <option value="executive">Command</option>
+              <option value="coordinator">Mission Control</option>
             </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Order
-            </label>
-            <input
-              type="number"
-              value={formData.order}
-              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
-            />
           </div>
 
           <div className="flex gap-3 pt-4">
