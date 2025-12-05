@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { GalleryImage } from "@/lib/data";
 import { useToast } from "@/components/ToastProvider";
+import { generateImageSizes } from "@/lib/image-utils";
 
 export default function GalleryPage() {
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -82,7 +83,7 @@ export default function GalleryPage() {
           >
             <div className="aspect-square relative">
               <img
-                src={image.src}
+                src={(image as any).thumbnail || (image as any).medium || image.src}
                 alt={image.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -285,22 +286,28 @@ function ImageForm({
     setLoading(true);
 
     try {
-      // Use the already compressed preview image
-      const imageSrc = imagePreview;
-
-      // Check if base64 string is too large (Next.js has ~4.5MB body limit)
-      // Base64 is ~33% larger than original, so we check for ~3MB base64 string
-      if (imageSrc.length > 4000000) {
-        showToast("Image is still too large after compression. Please try a smaller image or lower resolution.", "error");
-        setLoading(false);
-        return;
-      }
+      // Generate all image sizes (thumbnail, medium, full)
+      setLoading(true);
+      showToast("Generating optimized image sizes...", "info");
+      
+      const imageSizes = await generateImageSizes(imagePreview);
 
       const url = "/api/admin/gallery";
       const method = image ? "PUT" : "POST";
       const body = image
-        ? { ...formData, src: imageSrc, id: image.id }
-        : { ...formData, src: imageSrc };
+        ? { 
+            ...formData, 
+            src: imageSizes.full,
+            thumbnail: imageSizes.thumbnail,
+            medium: imageSizes.medium,
+            id: image.id 
+          }
+        : { 
+            ...formData, 
+            src: imageSizes.full,
+            thumbnail: imageSizes.thumbnail,
+            medium: imageSizes.medium
+          };
 
       const res = await fetch(url, {
         method,

@@ -32,7 +32,9 @@ model Event {
 
 model GalleryImage {
   id          String   @id @default(cuid())
-  src         String
+  src         String   // Full size image (base64)
+  thumbnail   String?  // Thumbnail size (base64) - ~150x150px
+  medium      String?  // Medium size (base64) - ~800x600px
   category    String
   title       String
   description String?
