@@ -12,7 +12,11 @@ export async function GET() {
       }
       return a.order - b.order;
     });
-    return NextResponse.json(sorted);
+    return NextResponse.json(sorted, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
     console.error("Error fetching team:", error);
     return NextResponse.json({ error: "Failed to fetch team" }, { status: 500 });

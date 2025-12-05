@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { GalleryImage } from "@/lib/data";
+import { useToast } from "@/components/ToastProvider";
 
 export default function GalleryPage() {
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -133,6 +134,7 @@ function ImageForm({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     title: image?.title || "",
     category: image?.category || "",
@@ -142,7 +144,6 @@ function ImageForm({
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [compressing, setCompressing] = useState(false);
-  const [error, setError] = useState<string>("");
 
   // Compress image before uploading
   const compressImage = (file: File): Promise<string> => {
@@ -205,18 +206,17 @@ function ImageForm({
   };
 
   const handleFileSelect = async (file: File) => {
-    setError("");
     
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file");
+      showToast("Please select a valid image file", "error");
       return;
     }
 
     // Validate file size (max 10MB before compression)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      setError("Image is large and will be compressed automatically.");
+      showToast("Image is large and will be compressed automatically.", "info");
     }
 
     try {
@@ -225,10 +225,10 @@ function ImageForm({
       // Compress and preview
       const compressedBase64 = await compressImage(file);
       setImagePreview(compressedBase64);
-      setError(""); // Clear any previous errors
+      // Clear any previous errors (no longer needed with toasts)
     } catch (err) {
       console.error("Error processing image:", err);
-      setError("Failed to process image. Please try another image.");
+      showToast("Failed to process image. Please try another image.", "error");
       setImageFile(null);
       setImagePreview("");
     } finally {
@@ -264,22 +264,21 @@ function ImageForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     // Validate image is present for new uploads
     if (!image && !imagePreview) {
-      setError("Please select an image");
+      showToast("Please select an image", "error");
       return;
     }
 
     // Validate required fields
     if (!formData.title.trim()) {
-      setError("Please enter a title");
+      showToast("Please enter a title", "error");
       return;
     }
 
     if (!formData.category) {
-      setError("Please select a category");
+      showToast("Please select a category", "error");
       return;
     }
 
@@ -292,7 +291,7 @@ function ImageForm({
       // Check if base64 string is too large (Next.js has ~4.5MB body limit)
       // Base64 is ~33% larger than original, so we check for ~3MB base64 string
       if (imageSrc.length > 4000000) {
-        setError("Image is still too large after compression. Please try a smaller image or lower resolution.");
+        showToast("Image is still too large after compression. Please try a smaller image or lower resolution.", "error");
         setLoading(false);
         return;
       }
@@ -312,15 +311,16 @@ function ImageForm({
       const data = await res.json();
 
       if (res.ok) {
+        showToast(image ? "Image updated successfully!" : "Image added successfully!", "success");
         onSuccess();
       } else {
         const errorMessage = data.error || "Failed to save image";
-        setError(errorMessage);
+        showToast(errorMessage, "error");
         console.error("API Error:", data);
       }
     } catch (error) {
       console.error("Error saving image:", error);
-      setError("Failed to save image. Please check your connection and try again.");
+      showToast("Failed to save image. Please check your connection and try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -339,11 +339,6 @@ function ImageForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
 
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
@@ -387,7 +382,6 @@ function ImageForm({
                       onClick={() => {
                         setImagePreview("");
                         setImageFile(null);
-                        setError("");
                       }}
                       className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-sm"
                       disabled={compressing}
