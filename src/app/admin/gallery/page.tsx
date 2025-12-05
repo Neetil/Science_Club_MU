@@ -83,7 +83,7 @@ export default function GalleryPage() {
           >
             <div className="aspect-square relative">
               <img
-                src={(image as any).thumbnail || (image as any).medium || image.src}
+                src={image.thumbnail || image.medium || image.src}
                 alt={image.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
