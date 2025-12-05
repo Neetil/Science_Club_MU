@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
       description: body.description,
       category: body.category,
       eventType: body.eventType || "upcoming",
-      image: body.image,
       published: body.published ?? false,
     });
 
@@ -45,7 +44,6 @@ export async function PUT(request: NextRequest) {
       description: body.description,
       category: body.category,
       eventType: body.eventType,
-      image: body.image,
       published: body.published,
     });
     return NextResponse.json(updated);
