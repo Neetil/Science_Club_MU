@@ -1,156 +1,133 @@
-import { promises as fs } from "fs";
-import { join } from "path";
+import { PrismaClient } from "@prisma/client";
+import type { ContactSubmission, Event, GalleryImage, Statistics, TeamMember, Update } from "@prisma/client";
 
-const DATA_DIR = join(process.cwd(), "data");
+export type { ContactSubmission, Event, GalleryImage, Statistics, TeamMember, Update } from "@prisma/client";
 
-// Ensure data directory exists
-async function ensureDataDir() {
-  try {
-    await fs.access(DATA_DIR);
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  }
+declare global {
+  var prisma: PrismaClient | undefined;
 }
 
-// Generic data file operations
-async function readDataFile<T>(filename: string, defaultValue: T): Promise<T> {
-  await ensureDataDir();
-  const filePath = join(DATA_DIR, filename);
-  
-  try {
-    const content = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(content) as T;
-  } catch {
-    // File doesn't exist, return default and create it
-    await writeDataFile(filename, defaultValue);
-    return defaultValue;
-  }
-}
+export const prisma = global.prisma ?? new PrismaClient();
 
-async function writeDataFile<T>(filename: string, data: T): Promise<void> {
-  await ensureDataDir();
-  const filePath = join(DATA_DIR, filename);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+if (process.env.NODE_ENV !== "production") {
+  global.prisma = prisma;
 }
 
 // Events
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  category: string;
-  image?: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export async function getEvents(): Promise<Event[]> {
-  return readDataFile<Event[]>("events.json", []);
-}
-
-export async function saveEvents(events: Event[]): Promise<void> {
-  await writeDataFile("events.json", events);
-}
-
-// Gallery Images
-export interface GalleryImage {
-  id: string;
-  src: string;
-  category: string;
-  title: string;
-  description?: string;
-  createdAt: string;
-}
-
-export async function getGalleryImages(): Promise<GalleryImage[]> {
-  return readDataFile<GalleryImage[]>("gallery.json", []);
-}
-
-export async function saveGalleryImages(images: GalleryImage[]): Promise<void> {
-  await writeDataFile("gallery.json", images);
-}
-
-// Team Members
-export interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  focus: string;
-  category: "executive" | "coordinator" | "mentor";
-  image?: string;
-  order: number;
-}
-
-export async function getTeamMembers(): Promise<TeamMember[]> {
-  return readDataFile<TeamMember[]>("team.json", []);
-}
-
-export async function saveTeamMembers(members: TeamMember[]): Promise<void> {
-  await writeDataFile("team.json", members);
-}
-
-// Updates/News
-export interface Update {
-  id: string;
-  date: string;
-  title: string;
-  shortDescription: string;
-  fullDescription: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export async function getUpdates(): Promise<Update[]> {
-  return readDataFile<Update[]>("updates.json", []);
-}
-
-export async function saveUpdates(updates: Update[]): Promise<void> {
-  await writeDataFile("updates.json", updates);
-}
-
-// Statistics
-export interface Statistics {
-  eventsConducted: number;
-  activeMembers: number;
-  outreachTrips: number;
-  updatedAt: string;
-}
-
-export async function getStatistics(): Promise<Statistics> {
-  return readDataFile<Statistics>("statistics.json", {
-    eventsConducted: 10,
-    activeMembers: 60,
-    outreachTrips: 5,
-    updatedAt: new Date().toISOString(),
+  return prisma.event.findMany({
+    orderBy: { createdAt: "desc" },
   });
 }
 
-export async function saveStatistics(stats: Statistics): Promise<void> {
-  await writeDataFile("statistics.json", stats);
+export async function createEvent(data: Omit<Event, "id" | "createdAt" | "updatedAt">) {
+  return prisma.event.create({ data });
+}
+
+export async function updateEvent(id: string, data: Partial<Omit<Event, "id" | "createdAt">>) {
+  return prisma.event.update({ where: { id }, data });
+}
+
+export async function deleteEvent(id: string) {
+  return prisma.event.delete({ where: { id } });
+}
+
+// Gallery Images
+export async function getGalleryImages(): Promise<GalleryImage[]> {
+  return prisma.galleryImage.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function createGalleryImage(data: Omit<GalleryImage, "id" | "createdAt">) {
+  return prisma.galleryImage.create({ data });
+}
+
+export async function updateGalleryImage(id: string, data: Partial<GalleryImage>) {
+  return prisma.galleryImage.update({ where: { id }, data });
+}
+
+export async function deleteGalleryImage(id: string) {
+  return prisma.galleryImage.delete({ where: { id } });
+}
+
+// Team Members
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  return prisma.teamMember.findMany({
+    orderBy: [{ order: "asc" }],
+  });
+}
+
+export async function createTeamMember(data: Omit<TeamMember, "id">) {
+  return prisma.teamMember.create({ data });
+}
+
+export async function updateTeamMember(id: string, data: Partial<TeamMember>) {
+  return prisma.teamMember.update({ where: { id }, data });
+}
+
+export async function deleteTeamMember(id: string) {
+  return prisma.teamMember.delete({ where: { id } });
+}
+
+// Updates/News
+export async function getUpdates(): Promise<Update[]> {
+  return prisma.update.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function createUpdate(data: Omit<Update, "id" | "createdAt" | "updatedAt">) {
+  return prisma.update.create({ data });
+}
+
+export async function updateUpdate(id: string, data: Partial<Omit<Update, "id" | "createdAt">>) {
+  return prisma.update.update({ where: { id }, data });
+}
+
+export async function deleteUpdate(id: string) {
+  return prisma.update.delete({ where: { id } });
+}
+
+// Statistics (single row)
+const DEFAULT_STATS = {
+  eventsConducted: 10,
+  activeMembers: 60,
+  outreachTrips: 5,
+  updatedAt: new Date(),
+};
+
+export async function getStatistics(): Promise<Statistics> {
+  const existing = await prisma.statistics.findUnique({ where: { id: 1 } });
+  if (existing) return existing;
+  return prisma.statistics.create({
+    data: {
+      id: 1,
+      ...DEFAULT_STATS,
+    },
+  });
+}
+
+export async function saveStatistics(stats: Omit<Statistics, "id">): Promise<Statistics> {
+  return prisma.statistics.upsert({
+    where: { id: 1 },
+    update: { ...stats, updatedAt: new Date() },
+    create: { id: 1, ...stats, updatedAt: new Date() },
+  });
 }
 
 // Contact Submissions
-export interface ContactSubmission {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  ip: string;
-  read: boolean;
-  createdAt: string;
-}
-
 export async function getContactSubmissions(): Promise<ContactSubmission[]> {
-  return readDataFile<ContactSubmission[]>("contact-submissions.json", []);
+  return prisma.contactSubmission.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 }
 
-export async function saveContactSubmissions(submissions: ContactSubmission[]): Promise<void> {
-  await writeDataFile("contact-submissions.json", submissions);
+export async function updateContactSubmission(id: string, data: Partial<ContactSubmission>) {
+  return prisma.contactSubmission.update({ where: { id }, data });
+}
+
+export async function deleteContactSubmission(id: string) {
+  return prisma.contactSubmission.delete({ where: { id } });
 }
 

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getContactSubmissions, saveContactSubmissions } from "@/lib/data";
+import {
+  deleteContactSubmission,
+  getContactSubmissions,
+  updateContactSubmission,
+} from "@/lib/data";
 
 export async function GET() {
   if (!(await isAuthenticated())) {
@@ -18,18 +22,19 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const submissions = await getContactSubmissions();
-    
-    const index = submissions.findIndex((s) => s.id === body.id);
-    if (index === -1) {
+    const updated = await updateContactSubmission(body.id, {
+      name: body.name,
+      email: body.email,
+      subject: body.subject,
+      message: body.message,
+      read: body.read,
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    if ((error as { code?: string }).code === "P2025") {
       return NextResponse.json({ error: "Submission not found" }, { status: 404 });
     }
-
-    submissions[index] = { ...submissions[index], ...body };
-    await saveContactSubmissions(submissions);
-
-    return NextResponse.json(submissions[index]);
-  } catch (error) {
     return NextResponse.json({ error: "Failed to update submission" }, { status: 500 });
   }
 }
@@ -47,12 +52,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Submission ID required" }, { status: 400 });
     }
 
-    const submissions = await getContactSubmissions();
-    const filtered = submissions.filter((s) => s.id !== id);
-    await saveContactSubmissions(filtered);
+    await deleteContactSubmission(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    if ((error as { code?: string }).code === "P2025") {
+      return NextResponse.json({ error: "Submission not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: "Failed to delete submission" }, { status: 500 });
   }
 }

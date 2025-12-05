@@ -20,13 +20,13 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const stats = await getStatistics();
     
-    const updated = {
-      ...stats,
-      ...body,
-      updatedAt: new Date().toISOString(),
-    };
+    const updated = await saveStatistics({
+      eventsConducted: body.eventsConducted ?? stats.eventsConducted,
+      activeMembers: body.activeMembers ?? stats.activeMembers,
+      outreachTrips: body.outreachTrips ?? stats.outreachTrips,
+      updatedAt: new Date(),
+    });
 
-    await saveStatistics(updated);
     return NextResponse.json(updated);
   } catch (error) {
     return NextResponse.json({ error: "Failed to update statistics" }, { status: 500 });

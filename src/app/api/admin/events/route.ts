@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getEvents, saveEvents, Event } from "@/lib/data";
+import { createEvent, deleteEvent, getEvents, updateEvent } from "@/lib/data";
 
 export async function GET() {
   if (!(await isAuthenticated())) {
@@ -18,10 +18,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const events = await getEvents();
-    
-    const newEvent: Event = {
-      id: Date.now().toString(),
+    const newEvent = await createEvent({
       title: body.title,
       description: body.description,
       date: body.date,
@@ -30,12 +27,7 @@ export async function POST(request: NextRequest) {
       category: body.category,
       image: body.image,
       published: body.published ?? false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    events.push(newEvent);
-    await saveEvents(events);
+    });
 
     return NextResponse.json(newEvent);
   } catch (error) {
@@ -50,22 +42,21 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const events = await getEvents();
-    
-    const index = events.findIndex((e) => e.id === body.id);
-    if (index === -1) {
+    const updated = await updateEvent(body.id, {
+      title: body.title,
+      description: body.description,
+      date: body.date,
+      time: body.time,
+      location: body.location,
+      category: body.category,
+      image: body.image,
+      published: body.published,
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    if ((error as { code?: string }).code === "P2025") {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
-
-    events[index] = {
-      ...events[index],
-      ...body,
-      updatedAt: new Date().toISOString(),
-    };
-
-    await saveEvents(events);
-    return NextResponse.json(events[index]);
-  } catch (error) {
     return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
   }
 }
@@ -83,12 +74,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Event ID required" }, { status: 400 });
     }
 
-    const events = await getEvents();
-    const filtered = events.filter((e) => e.id !== id);
-    await saveEvents(filtered);
+    await deleteEvent(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    if ((error as { code?: string }).code === "P2025") {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });
   }
 }
