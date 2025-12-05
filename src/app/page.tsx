@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
 
 interface Update {
   id: string;
@@ -88,7 +89,13 @@ export default function Page() {
         <div className="flex flex-col md:flex-row md:items-stretch gap-6">
           <ul className="flex flex-col md:flex-[2] md:grid md:grid-cols-2 gap-4">
             {loading ? (
-              <li className="col-span-2 text-center text-zinc-400 py-8">Loading updates...</li>
+              <>
+                {[...Array(4)].map((_, i) => (
+                  <li key={i} className={i >= 2 ? "hidden md:block" : ""}>
+                    <UpdateCardSkeleton />
+                  </li>
+                ))}
+              </>
             ) : updates.length === 0 ? (
               <li className="col-span-2 text-center text-zinc-400 py-8">No updates available</li>
             ) : (
@@ -113,24 +120,34 @@ export default function Page() {
           <aside className="rounded-xl border border-white/10 bg-white/[0.02] p-4 md:w-80 md:flex md:flex-col">
             <h3 className="text-base font-semibold text-white mb-4 text-center">Club Statistics</h3>
           <div className="space-y-4 md:flex-1 md:flex md:flex-col md:justify-between">
-            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
-              <p className="text-xs text-zinc-400 mb-1">Events conducted</p>
-              <p className="text-2xl font-bold text-cyan-300">
-                {loading ? "..." : `${statistics.eventsConducted}+`}
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
-              <p className="text-xs text-zinc-400 mb-1">Active members</p>
-              <p className="text-2xl font-bold text-cyan-300">
-                {loading ? "..." : `${statistics.activeMembers}+`}
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
-              <p className="text-xs text-zinc-400 mb-1">Outreach trips</p>
-              <p className="text-2xl font-bold text-cyan-300">
-                {loading ? "..." : `${statistics.outreachTrips}+`}
-              </p>
-            </div>
+            {loading ? (
+              <>
+                <StatisticsSkeleton />
+                <StatisticsSkeleton />
+                <StatisticsSkeleton />
+              </>
+            ) : (
+              <>
+                <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+                  <p className="text-xs text-zinc-400 mb-1">Events conducted</p>
+                  <p className="text-2xl font-bold text-cyan-300">
+                    {statistics.eventsConducted}+
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+                  <p className="text-xs text-zinc-400 mb-1">Active members</p>
+                  <p className="text-2xl font-bold text-cyan-300">
+                    {statistics.activeMembers}+
+                  </p>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-center">
+                  <p className="text-xs text-zinc-400 mb-1">Outreach trips</p>
+                  <p className="text-2xl font-bold text-cyan-300">
+                    {statistics.outreachTrips}+
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </aside>
         </div>
