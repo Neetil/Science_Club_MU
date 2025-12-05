@@ -12,8 +12,10 @@ export function middleware(request: NextRequest) {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
-    // Otherwise, allow access to login page
-    return NextResponse.next();
+    // Add header to indicate this is the login page
+    const response = NextResponse.next();
+    response.headers.set("x-is-login-page", "true");
+    return response;
   }
 
   // Protect all other admin routes
