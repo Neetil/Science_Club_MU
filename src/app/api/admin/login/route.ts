@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Reset rate limit on successful login
-    await createSession();
+    await createSession(username);
 
     return NextResponse.json({ success: true });
   } catch (error) {

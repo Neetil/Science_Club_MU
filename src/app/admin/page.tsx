@@ -11,9 +11,21 @@ export default function AdminDashboard() {
     updates: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     fetchStats();
+    // Get username from cookie
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+    const storedUsername = getCookie("admin-username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
   }, []);
 
   const fetchStats = async () => {
@@ -57,8 +69,10 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-        <p className="text-zinc-400">Welcome to the admin panel</p>
+        <h1 className="text-3xl font-bold text-white mb-2">
+          {username ? `Hi ${username}` : "Dashboard"}
+        </h1>
+        <p className="text-zinc-400">Welcome to the Command Center</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
