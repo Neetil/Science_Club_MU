@@ -12,6 +12,7 @@ const adminNavItems = [
   { label: "Updates", href: "/admin/updates", icon: "📢" },
   { label: "Contact", href: "/admin/contact", icon: "✉️" },
   { label: "Statistics", href: "/admin/statistics", icon: "📈" },
+  { label: "Backup", href: "/admin/backup", icon: "💾" },
 ];
 
 export function AdminSidebar() {

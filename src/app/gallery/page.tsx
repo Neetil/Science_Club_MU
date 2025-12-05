@@ -16,6 +16,8 @@ interface HeroImage {
 interface GalleryImage {
   id: string | number;
   src: string;
+  thumbnail?: string;
+  medium?: string;
   category: string;
   title: string;
   description?: string;
@@ -536,7 +538,7 @@ export default function GalleryPage() {
                           {/* Skeleton loader for individual images */}
                           <div className="absolute inset-0 bg-zinc-800/30 animate-pulse" />
                           <img
-                            src={image.src}
+                            src={image.medium || image.src}
                             alt={image.title}
                             loading={index < 6 ? "eager" : "lazy"}
                             decoding="async"
@@ -740,6 +742,16 @@ export default function GalleryPage() {
                     alt={selectedImage.title}
                     loading="eager"
                     className="h-auto w-full max-h-[70vh] object-contain"
+                    onLoad={(e) => {
+                      // Preload full size if medium was used initially
+                      if (selectedImage.medium && e.currentTarget.src === selectedImage.medium) {
+                        const fullImg = new Image();
+                        fullImg.src = selectedImage.src;
+                        fullImg.onload = () => {
+                          e.currentTarget.src = selectedImage.src;
+                        };
+                      }
+                    }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=800&fit=crop`;

@@ -27,8 +27,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if base64 string is too large (PostgreSQL TEXT can handle large strings, but we check anyway)
-    if (body.src.length > 10000000) {
+    // Check if base64 strings are too large
+    if (body.src.length > 10000000 || 
+        (body.thumbnail && body.thumbnail.length > 500000) ||
+        (body.medium && body.medium.length > 2000000)) {
       return NextResponse.json(
         { error: "Image is too large. Please compress it before uploading." },
         { status: 400 }
@@ -37,6 +39,8 @@ export async function POST(request: NextRequest) {
 
     const newImage = await createGalleryImage({
       src: body.src,
+      thumbnail: body.thumbnail || null,
+      medium: body.medium || null,
       category: body.category,
       title: body.title,
       description: null,
@@ -71,8 +75,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if base64 string is too large
-    if (body.src.length > 10000000) {
+    // Check if base64 strings are too large
+    if (body.src.length > 10000000 || 
+        (body.thumbnail && body.thumbnail.length > 500000) ||
+        (body.medium && body.medium.length > 2000000)) {
       return NextResponse.json(
         { error: "Image is too large. Please compress it before uploading." },
         { status: 400 }
@@ -81,6 +87,8 @@ export async function PUT(request: NextRequest) {
 
     const updated = await updateGalleryImage(body.id, {
       src: body.src,
+      thumbnail: body.thumbnail || null,
+      medium: body.medium || null,
       category: body.category,
       title: body.title,
       description: null,
