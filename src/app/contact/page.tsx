@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/ToastProvider";
 
 export default function ContactPage() {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -10,15 +12,10 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{
-    type: "success" | "error" | null;
-    message: string;
-  }>({ type: null, message: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: "" });
 
     try {
       const response = await fetch("/api/contact", {
@@ -32,22 +29,13 @@ export default function ContactPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSubmitStatus({
-          type: "success",
-          message: data.message || "Thank you for your message! We'll get back to you soon.",
-        });
+        showToast(data.message || "Thank you for your message! We'll get back to you soon.", "success");
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setSubmitStatus({
-          type: "error",
-          message: data.error || "Something went wrong. Please try again.",
-        });
+        showToast(data.error || "Something went wrong. Please try again.", "error");
       }
     } catch (error) {
-      setSubmitStatus({
-        type: "error",
-        message: "Failed to send message. Please check your connection and try again.",
-      });
+      showToast("Failed to send message. Please check your connection and try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -235,17 +223,6 @@ export default function ContactPage() {
             />
           </div>
 
-          {submitStatus.type && (
-            <div
-              className={`rounded-lg border p-4 ${
-                submitStatus.type === "success"
-                  ? "border-green-500/30 bg-green-500/10 text-green-200"
-                  : "border-red-500/30 bg-red-500/10 text-red-200"
-              }`}
-            >
-              <p className="text-sm">{submitStatus.message}</p>
-            </div>
-          )}
 
           <button
             type="submit"

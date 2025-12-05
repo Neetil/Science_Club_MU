@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ToastProvider";
 
 export default function AdminLogin() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-    setRemainingAttempts(null);
 
     try {
       const response = await fetch("/api/admin/login", {
@@ -27,24 +25,25 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("/admin");
-        router.refresh();
+        showToast("Login successful! Redirecting...", "success");
+        setTimeout(() => {
+          router.push("/admin");
+          router.refresh();
+        }, 500);
       } else {
-        // Check for rate limit info
-        const remaining = response.headers.get("X-RateLimit-Remaining");
-        if (remaining !== null) {
-          setRemainingAttempts(parseInt(remaining));
-        }
-
         // Check if it's a rate limit error
         if (response.status === 429) {
-          setError(data.error || "Too many login attempts. Please try again later.");
+          showToast(data.error || "Too many login attempts. Please try again later.", "error");
         } else {
-          setError(data.error || "Invalid credentials");
+          const remaining = response.headers.get("X-RateLimit-Remaining");
+          const message = remaining !== null 
+            ? `${data.error || "Invalid credentials"} (${remaining} attempts remaining)`
+            : data.error || "Invalid credentials";
+          showToast(message, "error");
         }
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      showToast("Something went wrong. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -60,16 +59,6 @@ export default function AdminLogin() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="rounded-lg bg-red-500/10 border border-red-500/50 p-3 text-red-400 text-sm">
-                {error}
-                {remainingAttempts !== null && remainingAttempts >= 0 && (
-                  <p className="mt-1 text-xs">
-                    Remaining attempts: {remainingAttempts}
-                  </p>
-                )}
-              </div>
-            )}
 
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-zinc-300 mb-2">

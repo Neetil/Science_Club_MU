@@ -13,7 +13,11 @@ export async function GET() {
         const dateB = parseDate(b.date);
         return dateB.getTime() - dateA.getTime();
       });
-    return NextResponse.json(publishedUpdates);
+    return NextResponse.json(publishedUpdates, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
     console.error("Error fetching updates:", error);
     return NextResponse.json({ error: "Failed to fetch updates" }, { status: 500 });
