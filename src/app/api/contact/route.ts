@@ -1,10 +1,8 @@
-import { promises as fs } from "fs";
-import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/data";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
-const SUBMISSIONS_FILE = join(process.cwd(), "data", "contact-submissions.json");
 
 declare global {
   var contactRateLimitStore: Map<string, { count: number; expiresAt: number }>;
@@ -60,19 +58,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Try to save submission (non-blocking - file system is read-only on Vercel)
-    saveSubmission({
-      id: Date.now().toString(),
-      name,
-      email,
-      subject,
-      message,
-      ip,
-      read: false,
-      createdAt: new Date().toISOString(),
-    }).catch((error) => {
-      // File saving fails on Vercel (read-only file system) - that's okay
-      console.warn("Failed to save submission to file (non-critical):", error.code);
+    // Persist submission to database (non-blocking for email)
+    await prisma.contactSubmission.create({
+      data: {
+        name,
+        email,
+        subject,
+        message,
+        ip,
+        read: false,
+      },
     });
 
     // Send email notification and wait for it to complete so serverless
@@ -108,65 +103,18 @@ export async function POST(request: NextRequest) {
 }
 
 type Submission = {
-  id: string;
   name: string;
   email: string;
   subject: string;
   message: string;
-  ip: string;
-  read: boolean;
-  createdAt: string;
 };
-
-async function saveSubmission(submission: Submission) {
-  // Skip file saving on Vercel (read-only file system)
-  // This function only works in local development
-  const fileDir = join(process.cwd(), "data");
-  
-  try {
-    await fs.mkdir(fileDir, { recursive: true });
-  } catch (error) {
-    // If we can't create directory (e.g., on Vercel), skip file saving
-    if ((error as NodeJS.ErrnoException).code === "EROFS") {
-      return;
-    }
-    throw error;
-  }
-
-  try {
-    const contents = await fs.readFile(SUBMISSIONS_FILE, "utf8");
-    const parsed = JSON.parse(contents) as Submission[];
-    parsed.push(submission);
-    await fs.writeFile(SUBMISSIONS_FILE, JSON.stringify(parsed, null, 2), "utf8");
-  } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ENOENT") {
-      // File doesn't exist, create it
-      try {
-        await fs.writeFile(SUBMISSIONS_FILE, JSON.stringify([submission], null, 2), "utf8");
-      } catch (writeError) {
-        // If write fails (e.g., read-only file system on Vercel), just return
-        if ((writeError as NodeJS.ErrnoException).code === "EROFS") {
-          return;
-        }
-        throw writeError;
-      }
-      return;
-    }
-    // If it's a read-only file system error (Vercel), just return silently
-    if (err.code === "EROFS") {
-      return;
-    }
-    throw error;
-  }
-}
 
 async function sendNotificationEmail({
   name,
   email,
   subject,
   message,
-}: Omit<Submission, "id" | "ip" | "read" | "createdAt">) {
+}: Submission) {
   const resendApiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_EMAIL ?? "science.club@medicaps.ac.in";
   // Resend requires verified domain - use onboarding@resend.dev for testing or your verified domain

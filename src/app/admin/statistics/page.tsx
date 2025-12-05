@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Statistics } from "@/lib/data";
+import type { Statistics } from "@prisma/client";
+
+type StatsState = Omit<Statistics, "updatedAt"> & { updatedAt: string | Date };
 
 export default function StatisticsPage() {
-  const [stats, setStats] = useState<Statistics>({
+  const [stats, setStats] = useState<StatsState>({
+    id: 1,
     eventsConducted: 10,
     activeMembers: 60,
     outreachTrips: 5,
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date(),
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,7 +24,11 @@ export default function StatisticsPage() {
     try {
       const res = await fetch("/api/admin/statistics");
       const data = await res.json();
-      setStats(data);
+      setStats({
+        ...data,
+        id: data.id ?? 1,
+        updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
+      });
     } catch (error) {
       console.error("Failed to fetch statistics:", error);
     } finally {
