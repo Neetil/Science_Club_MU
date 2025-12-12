@@ -13,7 +13,6 @@ const adminNavItems = [
   { label: "Contact", href: "/admin/contact", icon: "✉️" },
   { label: "Statistics", href: "/admin/statistics", icon: "📈" },
   { label: "Backup", href: "/admin/backup", icon: "💾" },
-  { label: "Migrate Images", href: "/admin/migrate-images", icon: "☁️" },
 ];
 
 export function AdminSidebar() {
