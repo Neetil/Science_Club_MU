@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20"); // Load 20 images at a time
+    const limit = parseInt(searchParams.get("limit") || "1000"); // Default to large limit to get all images
     const category = searchParams.get("category");
 
     const allImages = await getGalleryImages();
@@ -15,13 +15,23 @@ export async function GET(request: Request) {
       ? allImages.filter(img => img.category === category)
       : allImages;
 
-    // Calculate pagination
+    // If limit is very large (>= 1000), return all images without pagination
+    if (limit >= 1000) {
+      return NextResponse.json(
+        filteredImages,
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1200",
+          },
+        }
+      );
+    }
+
+    // Calculate pagination for smaller limits
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedImages = filteredImages.slice(startIndex, endIndex);
 
-    // Return only essential data (no base64 images in response for now, but we'll optimize later)
-    // For immediate fix: return paginated results
     return NextResponse.json(
       {
         images: paginatedImages,
@@ -35,7 +45,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1200", // 10 min cache, 20 min revalidate
+          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1200",
         },
       }
     );

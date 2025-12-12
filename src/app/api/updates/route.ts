@@ -4,9 +4,9 @@ import { getUpdates } from "@/lib/data";
 export async function GET() {
   try {
     const updates = await getUpdates();
-    // Only return published updates, sorted by date (newest first)
+    // Only return published updates (default to true if null/undefined), sorted by date (newest first)
     const publishedUpdates = updates
-      .filter((update) => update.published)
+      .filter((update) => update.published !== false) // Include if published is true or null/undefined
       .sort((a, b) => {
         // Parse dates (assuming format DD/MM/YY)
         const dateA = parseDate(a.date);
