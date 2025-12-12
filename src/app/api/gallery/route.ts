@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const allImages = await getGalleryImages();
     
     // Filter by category if provided
-    let filteredImages = category && category !== "All" 
+    const filteredImages = category && category !== "All" 
       ? allImages.filter(img => img.category === category)
       : allImages;
 
