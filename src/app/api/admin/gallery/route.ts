@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { createGalleryImage, deleteGalleryImage, getGalleryImages, updateGalleryImage } from "@/lib/data";
+import { uploadImageSizesToBlob } from "@/lib/blob-utils";
 
 export async function GET() {
   if (!(await isAuthenticated())) {
@@ -27,20 +28,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if base64 strings are too large
-    if (body.src.length > 10000000 || 
-        (body.thumbnail && body.thumbnail.length > 500000) ||
-        (body.medium && body.medium.length > 2000000)) {
+    // Upload images to Vercel Blob Storage
+    let imageUrls;
+    try {
+      imageUrls = await uploadImageSizesToBlob({
+        full: body.src,
+        thumbnail: body.thumbnail,
+        medium: body.medium,
+      }, `${body.category}-${Date.now()}`);
+    } catch (error) {
+      console.error("Error uploading to blob storage:", error);
       return NextResponse.json(
-        { error: "Image is too large. Please compress it before uploading." },
-        { status: 400 }
+        { error: "Failed to upload image to storage. Please try again." },
+        { status: 500 }
       );
     }
 
+    // Store URLs in database (keep base64 for backward compatibility during migration)
     const newImage = await createGalleryImage({
-      src: body.src,
+      src: body.src, // Keep base64 for now (will be removed after migration)
       thumbnail: body.thumbnail || null,
       medium: body.medium || null,
+      srcUrl: imageUrls.full,
+      thumbnailUrl: imageUrls.thumbnail || null,
+      mediumUrl: imageUrls.medium || null,
       category: body.category,
       title: body.title,
       description: null,
@@ -75,20 +86,30 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if base64 strings are too large
-    if (body.src.length > 10000000 || 
-        (body.thumbnail && body.thumbnail.length > 500000) ||
-        (body.medium && body.medium.length > 2000000)) {
+    // Upload images to Vercel Blob Storage
+    let imageUrls;
+    try {
+      imageUrls = await uploadImageSizesToBlob({
+        full: body.src,
+        thumbnail: body.thumbnail,
+        medium: body.medium,
+      }, `${body.category}-${Date.now()}`);
+    } catch (error) {
+      console.error("Error uploading to blob storage:", error);
       return NextResponse.json(
-        { error: "Image is too large. Please compress it before uploading." },
-        { status: 400 }
+        { error: "Failed to upload image to storage. Please try again." },
+        { status: 500 }
       );
     }
 
+    // Store URLs in database (keep base64 for backward compatibility during migration)
     const updated = await updateGalleryImage(body.id, {
-      src: body.src,
+      src: body.src, // Keep base64 for now (will be removed after migration)
       thumbnail: body.thumbnail || null,
       medium: body.medium || null,
+      srcUrl: imageUrls.full,
+      thumbnailUrl: imageUrls.thumbnail || null,
+      mediumUrl: imageUrls.medium || null,
       category: body.category,
       title: body.title,
       description: null,
