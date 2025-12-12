@@ -32,9 +32,12 @@ model Event {
 
 model GalleryImage {
   id          String   @id @default(cuid())
-  src         String   // Full size image (base64)
-  thumbnail   String?  // Thumbnail size (base64) - ~150x150px
-  medium      String?  // Medium size (base64) - ~800x600px
+  src         String   // Full size image (base64 or URL) - DEPRECATED: Use srcUrl
+  thumbnail   String?  // Thumbnail size (base64 or URL) - DEPRECATED: Use thumbnailUrl
+  medium      String?  // Medium size (base64 or URL) - DEPRECATED: Use mediumUrl
+  srcUrl      String?  // Full size image URL (Vercel Blob Storage)
+  thumbnailUrl String? // Thumbnail size URL (Vercel Blob Storage)
+  mediumUrl   String?  // Medium size URL (Vercel Blob Storage)
   category    String
   title       String
   description String?

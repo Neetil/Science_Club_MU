@@ -16,9 +16,12 @@ interface HeroImage {
 
 interface GalleryImage {
   id: string | number;
-  src: string;
-  thumbnail?: string;
-  medium?: string;
+  src: string; // Base64 (legacy) or URL
+  thumbnail?: string; // Base64 (legacy) or URL
+  medium?: string; // Base64 (legacy) or URL
+  srcUrl?: string; // Vercel Blob URL (preferred)
+  thumbnailUrl?: string; // Vercel Blob URL (preferred)
+  mediumUrl?: string; // Vercel Blob URL (preferred)
   category: string;
   title: string;
   description?: string;
@@ -130,14 +133,20 @@ export default function GalleryPage() {
     fetchGalleryData();
   }, []);
 
-  const fetchGalleryData = async () => {
+  const fetchGalleryData = async (page: number = 1) => {
     try {
       setIsLoading(true);
-      const galleryRes = await fetch("/api/gallery");
+      const galleryRes = await fetch(`/api/gallery?page=${page}&limit=20`);
 
       if (galleryRes.ok) {
-        const galleryData = await galleryRes.json();
-        setGalleryImagesState(galleryData);
+        const response = await galleryRes.json();
+        // Handle both old format (array) and new format (object with pagination)
+        if (Array.isArray(response)) {
+          setGalleryImagesState(response);
+        } else {
+          setGalleryImagesState(response.images || []);
+          // TODO: Implement infinite scroll with response.pagination
+        }
       }
     } catch (error) {
       console.error("Failed to fetch gallery data:", error);
@@ -536,7 +545,7 @@ export default function GalleryPage() {
                           {/* Skeleton loader for individual images */}
                           <div className="absolute inset-0 bg-zinc-800/30 animate-pulse" />
                           <img
-                            src={image.medium || image.src}
+                            src={image.mediumUrl || image.medium || image.srcUrl || image.src}
                             alt={image.title}
                             loading={index < 6 ? "eager" : "lazy"}
                             decoding="async"
@@ -621,7 +630,7 @@ export default function GalleryPage() {
                       }}
                     >
                       <img
-                        src={image.src}
+                        src={image.srcUrl || image.src}
                         alt={image.title}
                         loading="lazy"
                         className={`h-full w-full transition-transform duration-300 group-hover:scale-105 ${
@@ -736,17 +745,18 @@ export default function GalleryPage() {
                   )}
 
                   <img
-                    src={selectedImage.src}
+                    src={selectedImage.srcUrl || selectedImage.src}
                     alt={selectedImage.title}
                     loading="eager"
                     className="h-auto w-full max-h-[70vh] object-contain"
                     onLoad={(e) => {
                       // Preload full size if medium was used initially
-                      if (selectedImage.medium && e.currentTarget.src === selectedImage.medium) {
+                      const currentSrc = selectedImage.mediumUrl || selectedImage.medium;
+                      if (currentSrc && e.currentTarget.src === currentSrc) {
                         const fullImg = new Image();
-                        fullImg.src = selectedImage.src;
+                        fullImg.src = selectedImage.srcUrl || selectedImage.src;
                         fullImg.onload = () => {
-                          e.currentTarget.src = selectedImage.src;
+                          e.currentTarget.src = selectedImage.srcUrl || selectedImage.src;
                         };
                       }
                     }}
