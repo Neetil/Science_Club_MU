@@ -39,10 +39,20 @@ export default function BackupPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.type !== "application/json") {
+      // Check file type
+      if (selectedFile.type !== "application/json" && !selectedFile.name.endsWith('.json')) {
         showToast("Please select a JSON file", "error");
         return;
       }
+      
+      // Check file size (warn if over 30MB, but still allow)
+      const fileSizeMB = selectedFile.size / (1024 * 1024);
+      if (fileSizeMB > 50) {
+        showToast(`Warning: File is very large (${fileSizeMB.toFixed(1)}MB). This may take several minutes to restore.`, "info");
+      } else if (fileSizeMB > 30) {
+        showToast(`Large file detected (${fileSizeMB.toFixed(1)}MB). This may take a while.`, "info");
+      }
+      
       setFile(selectedFile);
     }
   };
@@ -59,19 +69,48 @@ export default function BackupPage() {
 
     setIsImporting(true);
     try {
+      // Read file as text
       const text = await file.text();
-      const backup = JSON.parse(text);
+      
+      // Validate file is not empty
+      if (!text || text.trim().length === 0) {
+        throw new Error("Backup file is empty");
+      }
 
+      // Try to parse JSON
+      let backup;
+      try {
+        backup = JSON.parse(text);
+      } catch (parseError) {
+        throw new Error(`Invalid JSON file. Please ensure you're using a valid backup file exported from this system. Error: ${parseError instanceof Error ? parseError.message : "Unknown parsing error"}`);
+      }
+
+      // Validate backup structure
+      if (!backup.data && !backup.events && !backup.galleryImages) {
+        throw new Error("Invalid backup file format. The file should contain a 'data' object with your backup data.");
+      }
+
+      // Prepare the data to send
+      const backupData = backup.data || backup;
+
+      // Make the API request
       const response = await fetch("/api/admin/backup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          data: backup.data || backup,
+          data: backupData,
           confirmOverwrite: true,
         }),
       });
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await response.text();
+        throw new Error(`Server returned an error: ${textResponse.substring(0, 200)}`);
+      }
 
       const result = await response.json();
 
@@ -79,7 +118,12 @@ export default function BackupPage() {
         throw new Error(result.error || "Failed to import backup");
       }
 
-      showToast(`Backup restored successfully! Restored ${JSON.stringify(result.results)}`, "success");
+      // Show success message with results
+      const resultsSummary = result.results 
+        ? `Events: ${result.results.events}, Gallery: ${result.results.galleryImages}, Team: ${result.results.teamMembers}, Updates: ${result.results.updates}`
+        : "Backup restored";
+      
+      showToast(`Backup restored successfully! ${resultsSummary}`, "success");
       setFile(null);
       
       // Reset file input
@@ -87,7 +131,10 @@ export default function BackupPage() {
       if (fileInput) fileInput.value = "";
     } catch (error) {
       console.error("Import error:", error);
-      showToast(error instanceof Error ? error.message : "Failed to import backup", "error");
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Failed to import backup. Please check the file format and try again.";
+      showToast(errorMessage, "error");
     } finally {
       setIsImporting(false);
     }
