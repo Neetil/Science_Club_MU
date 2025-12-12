@@ -133,19 +133,19 @@ export default function GalleryPage() {
     fetchGalleryData();
   }, []);
 
-  const fetchGalleryData = async (page: number = 1) => {
+  const fetchGalleryData = async () => {
     try {
       setIsLoading(true);
-      const galleryRes = await fetch(`/api/gallery?page=${page}&limit=20`);
+      // Fetch all images by requesting a large limit
+      const galleryRes = await fetch(`/api/gallery?limit=1000`);
 
       if (galleryRes.ok) {
         const response = await galleryRes.json();
-        // Handle both old format (array) and new format (object with pagination)
+        // API returns array when limit >= 1000, or object with pagination for smaller limits
         if (Array.isArray(response)) {
           setGalleryImagesState(response);
         } else {
           setGalleryImagesState(response.images || []);
-          // TODO: Implement infinite scroll with response.pagination
         }
       }
     } catch (error) {
