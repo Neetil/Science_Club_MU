@@ -3,6 +3,10 @@ import { isAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/data";
 import type { Event, GalleryImage, TeamMember, Update, ContactSubmission, Statistics } from "@prisma/client";
 
+// Increase body size limit for large backup files (up to 50MB)
+export const maxDuration = 300; // 5 minutes for large imports
+export const runtime = 'nodejs';
+
 /**
  * Export all database data as JSON backup
  */
@@ -60,7 +64,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError);
+      return NextResponse.json(
+        { error: "Invalid request body. The backup file may be too large or corrupted." },
+        { status: 400 }
+      );
+    }
+    
     const { data, confirmOverwrite } = body;
 
     if (!data) {
