@@ -26,17 +26,35 @@ export async function GET(request: NextRequest) {
       prisma.contactSubmission.findMany(),
     ]);
 
+    // Remove base64 image data from gallery images to reduce backup size
+    // Only keep URLs (Blob Storage) and metadata
+    const galleryImagesWithoutBase64 = galleryImages.map((img) => ({
+      id: img.id,
+      srcUrl: img.srcUrl,
+      thumbnailUrl: img.thumbnailUrl,
+      mediumUrl: img.mediumUrl,
+      category: img.category,
+      title: img.title,
+      description: img.description,
+      createdAt: img.createdAt,
+      // Only include base64 if URL doesn't exist (for backward compatibility)
+      src: img.srcUrl ? null : img.src,
+      thumbnail: img.thumbnailUrl ? null : img.thumbnail,
+      medium: img.mediumUrl ? null : img.medium,
+    }));
+
     const backup = {
-      version: "1.0",
+      version: "2.0", // Version bump to indicate base64 exclusion
       timestamp: new Date().toISOString(),
       data: {
         events,
-        galleryImages,
+        galleryImages: galleryImagesWithoutBase64,
         teamMembers,
         updates,
         statistics: statistics || null,
         contactSubmissions,
       },
+      note: "Base64 images excluded from backup. Images should be in Blob Storage. Only URLs and metadata are backed up.",
     };
 
     // Return as downloadable JSON file
@@ -132,11 +150,17 @@ export async function POST(request: NextRequest) {
       await prisma.galleryImage.deleteMany();
       if (data.galleryImages.length > 0) {
         await prisma.galleryImage.createMany({
-          data: data.galleryImages.map((img: GalleryImage) => ({
+          data: data.galleryImages.map((img: GalleryImage & { srcUrl?: string; thumbnailUrl?: string; mediumUrl?: string }) => ({
             id: img.id,
-            src: img.src,
-            thumbnail: img.thumbnail || null,
-            medium: img.medium || null,
+            // Prefer URLs over base64 (new format)
+            // If URL exists, use it; otherwise fall back to base64 (old format)
+            src: img.srcUrl || img.src || "",
+            thumbnail: img.thumbnailUrl || img.thumbnail || null,
+            medium: img.mediumUrl || img.medium || null,
+            // Store URLs if available
+            srcUrl: img.srcUrl || null,
+            thumbnailUrl: img.thumbnailUrl || null,
+            mediumUrl: img.mediumUrl || null,
             category: img.category,
             title: img.title,
             description: img.description || null,
