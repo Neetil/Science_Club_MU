@@ -13,6 +13,7 @@ const adminNavItems = [
   { label: "Contact", href: "/admin/contact", icon: "✉️" },
   { label: "Statistics", href: "/admin/statistics", icon: "📈" },
   { label: "Backup", href: "/admin/backup", icon: "💾" },
+  { label: "Migrate to R2", href: "/admin/migrate-vercel-to-r2", icon: "☁️" },
 ];
 
 export function AdminSidebar() {

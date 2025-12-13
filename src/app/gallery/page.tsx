@@ -19,9 +19,9 @@ interface GalleryImage {
   src: string; // Base64 (legacy) or URL
   thumbnail?: string; // Base64 (legacy) or URL
   medium?: string; // Base64 (legacy) or URL
-  srcUrl?: string; // Vercel Blob URL (preferred)
-  thumbnailUrl?: string; // Vercel Blob URL (preferred)
-  mediumUrl?: string; // Vercel Blob URL (preferred)
+  srcUrl?: string; // Cloudflare R2 URL (preferred)
+  thumbnailUrl?: string; // Cloudflare R2 URL (preferred)
+  mediumUrl?: string; // Cloudflare R2 URL (preferred)
   category: string;
   title: string;
   description?: string;
