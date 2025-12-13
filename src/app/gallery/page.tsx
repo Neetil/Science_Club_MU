@@ -69,7 +69,14 @@ export default function GalleryPage() {
       if (heroRes.ok) {
         const heroData = await heroRes.json();
         // Convert HeroGallery to HeroImage format
-        const heroImages = heroData.map((img: any) => ({
+        const heroImages = heroData.map((img: {
+          id: string;
+          src: string;
+          srcUrl?: string | null;
+          category: string;
+          title: string;
+          description?: string | null;
+        }) => ({
           id: img.id,
           src: img.srcUrl || img.src,
           srcUrl: img.srcUrl,
