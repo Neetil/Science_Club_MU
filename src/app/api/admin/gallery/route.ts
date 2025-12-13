@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { createGalleryImage, deleteGalleryImage, getGalleryImages, updateGalleryImage } from "@/lib/data";
-import { uploadImageSizesToBlob } from "@/lib/blob-utils";
+import { uploadImageSizesToBlob, deleteImagesFromBlob } from "@/lib/blob-utils";
 
 export async function GET() {
   if (!(await isAuthenticated())) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload images to Vercel Blob Storage
+    // Upload images to Cloudflare R2
     let imageUrls;
     try {
       imageUrls = await uploadImageSizesToBlob({
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         medium: body.medium,
       }, `${body.category}-${Date.now()}`);
     } catch (error) {
-      console.error("Error uploading to blob storage:", error);
+      console.error("Error uploading to R2 storage:", error);
       return NextResponse.json(
         { error: "Failed to upload image to storage. Please try again." },
         { status: 500 }
@@ -86,7 +86,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Upload images to Vercel Blob Storage
+    // Get existing image to delete old files from R2
+    const existingImage = await getGalleryImages().then(images => images.find(img => img.id === body.id));
+    
+    // Upload new images to Cloudflare R2
     let imageUrls;
     try {
       imageUrls = await uploadImageSizesToBlob({
@@ -95,11 +98,20 @@ export async function PUT(request: NextRequest) {
         medium: body.medium,
       }, `${body.category}-${Date.now()}`);
     } catch (error) {
-      console.error("Error uploading to blob storage:", error);
+      console.error("Error uploading to R2 storage:", error);
       return NextResponse.json(
         { error: "Failed to upload image to storage. Please try again." },
         { status: 500 }
       );
+    }
+
+    // Delete old images from R2 if they exist
+    if (existingImage) {
+      await deleteImagesFromBlob([
+        existingImage.srcUrl,
+        existingImage.thumbnailUrl,
+        existingImage.mediumUrl,
+      ]);
     }
 
     // Store URLs in database (keep base64 for backward compatibility during migration)
@@ -140,7 +152,21 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Image ID required" }, { status: 400 });
     }
 
+    // Get image before deleting to remove files from R2
+    const images = await getGalleryImages();
+    const imageToDelete = images.find(img => img.id === id);
+
+    // Delete from database
     await deleteGalleryImage(id);
+
+    // Delete images from R2
+    if (imageToDelete) {
+      await deleteImagesFromBlob([
+        imageToDelete.srcUrl,
+        imageToDelete.thumbnailUrl,
+        imageToDelete.mediumUrl,
+      ]);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

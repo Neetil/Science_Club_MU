@@ -8,7 +8,7 @@ A modern, full-featured website for the Physics & Astronomy Club at Medicaps Uni
 
 - **Public Pages**: Home, About, Events, Gallery, Team, Contact
 - **Admin Panel**: Complete CMS for managing content
-- **Image Management**: Vercel Blob Storage integration for optimized image delivery
+- **Image Management**: Cloudflare R2 integration for optimized image delivery via CDN
 - **Backup & Restore**: Full database backup/restore functionality
 - **SEO Optimized**: Meta tags, sitemap, robots.txt, structured data
 - **Responsive Design**: Mobile-first, modern UI with animations
@@ -19,7 +19,8 @@ A modern, full-featured website for the Physics & Astronomy Club at Medicaps Uni
 
 - Node.js 18+ (or Bun)
 - PostgreSQL database (Neon recommended)
-- Vercel account (for deployment and Blob Storage)
+- Cloudflare account (for R2 storage)
+- Vercel account (for deployment)
 
 ## 🛠️ Setup
 
@@ -46,8 +47,13 @@ ADMIN_PASSWORD="your-secure-password"
 # Base URL (for SEO)
 NEXT_PUBLIC_BASE_URL="https://your-domain.com"
 
-# Vercel Blob Storage (automatically set in Vercel)
-BLOB_READ_WRITE_TOKEN="your-blob-token" # Optional, auto-configured in Vercel
+# Cloudflare R2 Storage
+R2_ACCOUNT_ID="your-r2-account-id"
+R2_ACCESS_KEY_ID="your-r2-access-key-id"
+R2_SECRET_ACCESS_KEY="your-r2-secret-access-key"
+R2_BUCKET_NAME="your-bucket-name"
+R2_ENDPOINT="https://your-account-id.r2.cloudflarestorage.com" # Optional, auto-generated if not provided
+R2_PUBLIC_URL="https://cdn.yourdomain.com" # Optional: Custom domain for public access
 ```
 
 ### 3. Database Setup
@@ -104,22 +110,69 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ## 🖼️ Image Management
 
-### Vercel Blob Storage Setup
+### Cloudflare R2 Setup
 
-1. **Enable Blob Storage in Vercel**
-   - Go to Vercel Dashboard → Your Project → Settings → Storage
-   - Click "Create Database" → Select "Blob"
-   - Token is automatically configured
+Cloudflare R2 is an S3-compatible object storage service with zero egress fees, perfect for serving images via CDN.
 
-2. **Database Migration** (if not done)
-   ```bash
-   npx prisma migrate deploy
-   ```
+#### Step 1: Create R2 Bucket
 
-3. **Upload Images**
-   - Images uploaded through admin panel automatically go to Blob Storage
-   - Multiple sizes generated: thumbnail, medium, full
-   - URLs stored in database (not base64)
+1. **Sign in to Cloudflare Dashboard**
+   - Visit: https://dash.cloudflare.com
+   - Navigate to **R2** → **Create bucket**
+   - Enter a bucket name (e.g., `club-images`)
+   - Select a location (closest to your users)
+   - Click **Create bucket**
+
+#### Step 2: Create API Token
+
+1. **Go to R2 API Tokens**
+   - Navigate to **R2** → **Manage R2 API Tokens**
+   - Click **Create API token**
+   - Enter a token name (e.g., `club-website-token`)
+   - Select **Admin Read & Write** permissions
+   - Click **Create API Token**
+   - **Save the credentials**:
+     - Account ID
+     - Access Key ID
+     - Secret Access Key
+
+#### Step 3: Configure Public Access (Optional but Recommended)
+
+1. **Create Custom Domain** (Recommended for better performance)
+   - Go to your bucket → **Settings** → **Public Access**
+   - Click **Connect Domain**
+   - Enter a subdomain (e.g., `cdn.yourdomain.com`)
+   - Follow DNS setup instructions
+   - Add this domain to `R2_PUBLIC_URL` in `.env`
+
+   **OR** use R2's public URL format:
+   - Go to **Settings** → **Public Access** → Enable **Public Access**
+   - Note: You'll get URLs like `https://pub-{accountId}.r2.dev/{bucket}/{key}`
+
+#### Step 4: Set Environment Variables
+
+Add these to your `.env` file:
+
+```env
+R2_ACCOUNT_ID="your-account-id"
+R2_ACCESS_KEY_ID="your-access-key-id"
+R2_SECRET_ACCESS_KEY="your-secret-access-key"
+R2_BUCKET_NAME="club-images"
+R2_PUBLIC_URL="https://cdn.yourdomain.com" # Optional: Your custom domain
+```
+
+#### Step 5: Deploy
+
+When deploying to Vercel, add the same environment variables in:
+- Vercel Dashboard → Your Project → Settings → Environment Variables
+
+#### How It Works
+
+- **Upload Images**: Images uploaded through admin panel automatically go to R2
+- **Multiple Sizes**: Thumbnail, medium, and full sizes are generated and uploaded
+- **CDN Delivery**: Images served via Cloudflare's global CDN
+- **Zero Egress Fees**: No charges for bandwidth/downloads
+- **Database**: Only URLs stored in database (not base64)
 
 ### Processing Old Backups
 
@@ -200,15 +253,21 @@ Add these in Vercel Dashboard → Settings → Environment Variables:
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 - `NEXT_PUBLIC_BASE_URL`
-- `BLOB_READ_WRITE_TOKEN` (auto-configured if Blob Storage enabled)
+- `R2_ACCOUNT_ID`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_BUCKET_NAME`
+- `R2_PUBLIC_URL` (optional: custom domain)
 
 ## 📊 Network Transfer Optimization
 
-The website uses Vercel Blob Storage for images to minimize database transfer:
-- Images served from CDN (doesn't count against Neon limit)
+The website uses Cloudflare R2 for images to minimize database transfer:
+- Images served from Cloudflare CDN (doesn't count against Neon limit)
+- Zero egress fees (unlimited free bandwidth)
 - Only metadata stored in database
 - Automatic image optimization
 - Multiple image sizes (thumbnail, medium, full)
+- Global CDN for fast image delivery worldwide
 
 ## 🛠️ Scripts
 
@@ -244,7 +303,7 @@ node scripts/process-backup.js <file>  # Process old backup files
 
 - **Admin Credentials**: Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env`
 - **Database**: Uses Neon PostgreSQL (free tier: 5 GB storage, 5 GB network transfer/month)
-- **Images**: Stored in Vercel Blob Storage (free tier: 5 GB storage, 100 GB bandwidth/month)
+- **Images**: Stored in Cloudflare R2 (10 GB free storage, unlimited egress/bandwidth)
 - **Backups**: Exclude base64 images to keep file size small
 - **Security**: Rate limiting on login (3 attempts per 5 minutes)
 
@@ -256,8 +315,10 @@ node scripts/process-backup.js <file>  # Process old backup files
 - Ensure SSL mode is included: `?sslmode=require`
 
 ### Images Not Loading
-- Verify Vercel Blob Storage is enabled
-- Check `BLOB_READ_WRITE_TOKEN` is set (auto in Vercel)
+- Verify Cloudflare R2 credentials are set correctly
+- Check `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, and `R2_BUCKET_NAME` in environment variables
+- Ensure R2 bucket has public access enabled
+- Check if `R2_PUBLIC_URL` is correctly set (if using custom domain)
 - Ensure images have URLs in database
 
 ### Backup Too Large
