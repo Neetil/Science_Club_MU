@@ -9,6 +9,7 @@ const categories = ["All", "Team", "Astronomy Night", "Outreach Visits", "Observ
 interface HeroImage {
   id: string;
   src: string;
+  srcUrl?: string;
   category: string;
   title: string;
   description?: string;
@@ -27,94 +28,6 @@ interface GalleryImage {
   description?: string;
 }
 
-// Hero images for the featured showcase section - hardcoded
-const defaultHeroImages: HeroImage[] = [
-  {
-    id: "hero-1",
-    src: "/images/gallery/IMG_73255.jpg",
-    category: "Event",
-    title: "Orientation Ceremony",
-    description: "Introducing the club, the crew, and the cosmic missions we'll take on.",
-  },
-  {
-    id: "hero-2",
-    src: "/images/gallery/IMG_7336.JPEG",
-    category: "Event",
-    title: "Space Talk 2.0",
-    description: "When the universe speaks, we listen - Space Talk 2.0 where curiosity dares to touch the unknown.",
-  },
-  {
-    id: "hero-3",
-    src: "/images/gallery/IMG_7347.JPG",
-    category: "Team",
-    title: "The Operational Backbone",
-    description: "The backbone of every event and every discovery. Meet the crew that keeps the universe closer to campus.",
-  },
-  {
-    id: "hero-4",
-    src: "/images/gallery/IMG_7315.JPEG",
-    category: "Astronomy Night",
-    title: "Astronomy Night",
-    description: "A night of real exploration - where telescopes reveal what the eye can't. A practical dive into the wonders scattered across the night sky.",
-  },
-  {
-    id: "hero-4a",
-    src: "/images/gallery/IMG_7381.JPG",
-    category: "Team",
-    title: "Team Council",
-    description: "Meet the leaders of the club - where vision meets action. Shaping events, inspiring members, and pushing boundaries of discovery.",
-  },
-  {
-    id: "hero-4b",
-    src: "/images/gallery/IMG_7382.JPG",
-    category: "Team",
-    title: "Team Heads",
-    description: "Meet the heads of each department - where passion meets precision. Guiding events, managing resources, and leading the club towards new heights.",
-  },
-  {
-    id: "hero-4c",
-    src: "/images/gallery/IMG_30044.jpg",
-    category: "Team",
-    title: "Our Cosmic Family",
-    description: "The heart of our club - a community of curious minds united by the stars. Together, we learn, explore and celebrate the wonders of the universe.",
-  },
-  {
-    id: "hero-9",
-    src: "/images/gallery/IMG_2997.JPEG",
-    category: "Astronomy Night",
-    title: "Night Under the Stars",
-    description: "The universe doesn't sleep - and neither do we. A night of discovery, learning and bonding under the stars.",
-  },
-  {
-    id: "hero-5",
-    src: "/images/gallery/IMG_44811.jpg",
-    category: "Observation",
-    title: "Satellite Model",
-    description: "Exploring how tech reaches space - from tiny components to missions that orbit the earth and how satellites keep us connected with the universe.",
-  },
-  {
-    id: "hero-6",
-    src: "/images/gallery/IMG_44800.jpg",
-    category: "Observation",
-    title: "Rocket Model",
-    description: "From fuel to flight, where power meets precision, which makes the rockets reach the unreachable.",
-  },
-  {
-    id: "hero-7",
-    src: "/images/gallery/45666.jpg",
-    category: "Team",
-    title: "Spider Man Moment",
-    description: "Multiple Spider Man? Nope just us figuring out who's responsible for the mess. Blame travels faster than the speed of light.",
-  },
-  {
-    id: "hero-8",
-    src: "/images/gallery/IMG_73345.jpg",
-    category: "Team",
-    title: "Club Gathering",
-    description: "When the club gathers, even the night sky looks brighter. Stories, laughs and a little bit of chaos. Together, we make the club a family.",
-  },
-];
-
 export default function GalleryPage() {
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -126,6 +39,7 @@ export default function GalleryPage() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [galleryImagesState, setGalleryImagesState] = useState<GalleryImage[]>([]);
+  const [heroImagesState, setHeroImagesState] = useState<HeroImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch gallery data
@@ -137,7 +51,10 @@ export default function GalleryPage() {
     try {
       setIsLoading(true);
       // Fetch all images by requesting a large limit
-      const galleryRes = await fetch(`/api/gallery?limit=1000`);
+      const [galleryRes, heroRes] = await Promise.all([
+        fetch(`/api/gallery?limit=1000`),
+        fetch(`/api/hero-gallery`)
+      ]);
 
       if (galleryRes.ok) {
         const response = await galleryRes.json();
@@ -148,6 +65,20 @@ export default function GalleryPage() {
           setGalleryImagesState(response.images || []);
         }
       }
+
+      if (heroRes.ok) {
+        const heroData = await heroRes.json();
+        // Convert HeroGallery to HeroImage format
+        const heroImages = heroData.map((img: any) => ({
+          id: img.id,
+          src: img.srcUrl || img.src,
+          srcUrl: img.srcUrl,
+          category: img.category,
+          title: img.title,
+          description: img.description || "",
+        }));
+        setHeroImagesState(heroImages);
+      }
     } catch (error) {
       console.error("Failed to fetch gallery data:", error);
     } finally {
@@ -155,8 +86,7 @@ export default function GalleryPage() {
     }
   };
 
-  // Always use default hero images (they are hardcoded and should not be changed)
-  const heroImages = defaultHeroImages;
+  const heroImages = heroImagesState;
   const galleryImages = galleryImagesState;
 
   // Memoize filtered images for expanded modal
@@ -234,7 +164,7 @@ export default function GalleryPage() {
     });
   }, [galleryImages.length]);
 
-  const currentFeatured = heroImages[featuredIndex];
+  const currentFeatured = heroImages.length > 0 ? heroImages[featuredIndex] : null;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0a0d14]">
@@ -362,18 +292,24 @@ export default function GalleryPage() {
               {/* Content Overlay with Slide Animation */}
               <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 sm:p-12 pb-10 sm:pb-14 text-white">
                 <div className="max-w-2xl transform transition-all duration-700 group-hover:translate-y-0 hidden md:block">
-                  <div
-                    key={featuredIndex}
-                    className="animate-slide-up-fade"
-                  >
-                    <span className="inline-flex rounded-full bg-indigo-500/30 px-4 py-1.5 text-sm text-indigo-200 ring-1 ring-indigo-500/50 mb-4 backdrop-blur-sm animate-pulse-slow">
-                      {currentFeatured.category}
-                    </span>
-                    <h2 className="text-4xl sm:text-5xl font-bold mb-3 pb-2 leading-[1.2] bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent animate-text-shimmer">
-                      {currentFeatured.title}
-                    </h2>
-                    <p className="text-lg text-indigo-200 animate-fade-in-delay">{currentFeatured.description}</p>
-                  </div>
+                  {currentFeatured ? (
+                    <div
+                      key={featuredIndex}
+                      className="animate-slide-up-fade"
+                    >
+                      <span className="inline-flex rounded-full bg-indigo-500/30 px-4 py-1.5 text-sm text-indigo-200 ring-1 ring-indigo-500/50 mb-4 backdrop-blur-sm animate-pulse-slow">
+                        {currentFeatured.category}
+                      </span>
+                      <h2 className="text-4xl sm:text-5xl font-bold mb-3 pb-2 leading-[1.2] bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent animate-text-shimmer">
+                        {currentFeatured.title}
+                      </h2>
+                      <p className="text-lg text-indigo-200 animate-fade-in-delay">{currentFeatured.description}</p>
+                    </div>
+                  ) : (
+                    <div className="animate-slide-up-fade">
+                      <p className="text-lg text-indigo-200">No hero images available. Add images from the admin panel.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

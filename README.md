@@ -8,6 +8,7 @@ A modern, full-featured website for the Physics & Astronomy Club at Medicaps Uni
 
 - **Public Pages**: Home, About, Events, Gallery, Team, Contact
 - **Admin Panel**: Complete CMS for managing content
+- **Hero Gallery**: Manage featured images in the gallery hero section
 - **Image Management**: Cloudflare R2 integration for optimized image delivery via CDN
 - **Backup & Restore**: Full database backup/restore functionality
 - **SEO Optimized**: Meta tags, sitemap, robots.txt, structured data
@@ -258,20 +259,6 @@ Add these in Vercel Dashboard → Settings → Environment Variables:
 - `R2_SECRET_ACCESS_KEY`
 - `R2_BUCKET_NAME`
 - `R2_PUBLIC_URL` (optional: custom domain)
-
-## 🔄 Migrating from Vercel Blob to Cloudflare R2
-
-If you have existing images in Vercel Blob Storage, you can migrate them to Cloudflare R2 with one click:
-
-1. **Go to Admin Panel** → **Migrate to R2**
-2. **Review the migration status** - See how many images need migration
-3. **Click "Start Migration"** - This will:
-   - Download all images from Vercel Blob Storage
-   - Upload them to Cloudflare R2
-   - Update database URLs automatically
-   - Preserve all image metadata
-
-**Note**: After migration, you can safely remove Vercel Blob Storage from your Vercel project. The migration tool will handle everything automatically.
 
 ## 📊 Network Transfer Optimization
 

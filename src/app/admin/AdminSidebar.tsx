@@ -8,12 +8,12 @@ const adminNavItems = [
   { label: "Dashboard", href: "/admin", icon: "📊" },
   { label: "Events", href: "/admin/events", icon: "📅" },
   { label: "Gallery", href: "/admin/gallery", icon: "🖼️" },
+  { label: "Hero Gallery", href: "/admin/hero-gallery", icon: "⭐" },
   { label: "Team", href: "/admin/team", icon: "👥" },
   { label: "Updates", href: "/admin/updates", icon: "📢" },
   { label: "Contact", href: "/admin/contact", icon: "✉️" },
   { label: "Statistics", href: "/admin/statistics", icon: "📈" },
   { label: "Backup", href: "/admin/backup", icon: "💾" },
-  { label: "Migrate to R2", href: "/admin/migrate-vercel-to-r2", icon: "☁️" },
 ];
 
 export function AdminSidebar() {

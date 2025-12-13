@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import type { ContactSubmission, Event, GalleryImage, Statistics, TeamMember, Update } from "@prisma/client";
+import type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update } from "@prisma/client";
 
-export type { ContactSubmission, Event, GalleryImage, Statistics, TeamMember, Update } from "@prisma/client";
+export type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update } from "@prisma/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -129,5 +129,24 @@ export async function updateContactSubmission(id: string, data: Partial<ContactS
 
 export async function deleteContactSubmission(id: string) {
   return prisma.contactSubmission.delete({ where: { id } });
+}
+
+// Hero Gallery Images
+export async function getHeroGalleryImages(): Promise<HeroGallery[]> {
+  return prisma.heroGallery.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+  });
+}
+
+export async function createHeroGalleryImage(data: Omit<HeroGallery, "id" | "createdAt" | "updatedAt">) {
+  return prisma.heroGallery.create({ data });
+}
+
+export async function updateHeroGalleryImage(id: string, data: Partial<Omit<HeroGallery, "id" | "createdAt" | "updatedAt">>) {
+  return prisma.heroGallery.update({ where: { id }, data });
+}
+
+export async function deleteHeroGalleryImage(id: string) {
+  return prisma.heroGallery.delete({ where: { id } });
 }
 
