@@ -1,17 +1,35 @@
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/data";
+import * as bcrypt from "bcrypt";
 
-// Require environment variables - no defaults for security
+// For backward compatibility, check env vars first
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function verifyCredentials(username: string, password: string): Promise<boolean> {
-  // Validate that credentials are configured
-  if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-    console.error("Admin credentials not configured. Please set ADMIN_USERNAME and ADMIN_PASSWORD environment variables.");
+  // First, try environment variables (backward compatibility)
+  if (ADMIN_USERNAME && ADMIN_PASSWORD) {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      return true;
+    }
+  }
+
+  // Then check database
+  try {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user || !user.active) {
+      return false;
+    }
+
+    // Compare hashed password
+    return await bcrypt.compare(password, user.password);
+  } catch (error) {
+    console.error("Error verifying credentials:", error);
     return false;
   }
-  
-  return username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
 }
 
 export async function createSession(username: string) {
