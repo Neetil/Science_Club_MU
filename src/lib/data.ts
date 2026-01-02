@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update } from "@prisma/client";
+import type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
 
-export type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update } from "@prisma/client";
+export type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
