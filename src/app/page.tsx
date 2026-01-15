@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
 
@@ -55,13 +55,55 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const CACHE_KEY = "homepage_data";
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+    const fetchFreshData = async (cacheKey: string) => {
+      try {
+        const [updatesRes, statsRes] = await Promise.all([
+          fetch("/api/updates"),
+          fetch("/api/statistics"),
+        ]);
+
+        let updatesData: Update[] = [];
+        let statsData: Statistics = {
+          eventsConducted: 0,
+          activeMembers: 0,
+          outreachTrips: 0,
+        };
+
+        if (updatesRes.ok) {
+          updatesData = await updatesRes.json();
+          setUpdates(updatesData.slice(0, 4)); // Show latest 4 updates
+        }
+
+        if (statsRes.ok) {
+          statsData = await statsRes.json();
+          setStatistics(statsData);
+        }
+
+        // Cache the data
+        try {
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              data: {
+                updates: updatesData,
+                statistics: statsData,
+              },
+              timestamp: Date.now(),
+            })
+          );
+        } catch (error) {
+          console.error("Error saving cache:", error);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     // Check cache first
     try {
@@ -88,53 +130,11 @@ export default function Page() {
 
     // No valid cache, fetch normally
     await fetchFreshData(CACHE_KEY);
-  };
+  }, []);
 
-  const fetchFreshData = async (cacheKey: string) => {
-    try {
-      const [updatesRes, statsRes] = await Promise.all([
-        fetch("/api/updates"),
-        fetch("/api/statistics"),
-      ]);
-
-      let updatesData: Update[] = [];
-      let statsData: Statistics = {
-        eventsConducted: 0,
-        activeMembers: 0,
-        outreachTrips: 0,
-      };
-
-      if (updatesRes.ok) {
-        updatesData = await updatesRes.json();
-        setUpdates(updatesData.slice(0, 4)); // Show latest 4 updates
-      }
-
-      if (statsRes.ok) {
-        statsData = await statsRes.json();
-        setStatistics(statsData);
-      }
-
-      // Cache the data
-      try {
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({
-            data: {
-              updates: updatesData,
-              statistics: statsData,
-            },
-            timestamp: Date.now(),
-          })
-        );
-      } catch (error) {
-        console.error("Error saving cache:", error);
-      }
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const expandedUpdate =
     expandedPanel !== null ? updates.find((u) => u.id === expandedPanel) ?? null : null;
