@@ -60,20 +60,74 @@ export default function Page() {
   }, []);
 
   const fetchData = async () => {
+    const CACHE_KEY = "homepage_data";
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+    // Check cache first
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const now = Date.now();
+        
+        // If cache is still valid (less than 5 minutes old)
+        if (now - timestamp < CACHE_DURATION) {
+          // Use cached data immediately
+          setUpdates(data.updates.slice(0, 4));
+          setStatistics(data.statistics);
+          setLoading(false);
+          
+          // Fetch fresh data in background to update cache
+          fetchFreshData(CACHE_KEY);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error reading cache:", error);
+    }
+
+    // No valid cache, fetch normally
+    await fetchFreshData(CACHE_KEY);
+  };
+
+  const fetchFreshData = async (cacheKey: string) => {
     try {
       const [updatesRes, statsRes] = await Promise.all([
         fetch("/api/updates"),
         fetch("/api/statistics"),
       ]);
 
+      let updatesData: Update[] = [];
+      let statsData: Statistics = {
+        eventsConducted: 0,
+        activeMembers: 0,
+        outreachTrips: 0,
+      };
+
       if (updatesRes.ok) {
-        const updatesData = await updatesRes.json();
+        updatesData = await updatesRes.json();
         setUpdates(updatesData.slice(0, 4)); // Show latest 4 updates
       }
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json();
+        statsData = await statsRes.json();
         setStatistics(statsData);
+      }
+
+      // Cache the data
+      try {
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data: {
+              updates: updatesData,
+              statistics: statsData,
+            },
+            timestamp: Date.now(),
+          })
+        );
+      } catch (error) {
+        console.error("Error saving cache:", error);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -292,9 +346,23 @@ export default function Page() {
                   <p className="text-xs text-zinc-400">Update • {expandedUpdate.date}</p>
                   <h3 className="mt-2 text-xl sm:text-2xl font-bold text-white">{expandedUpdate.title}</h3>
                 </div>
-                <p className="text-sm sm:text-base leading-relaxed text-zinc-300 whitespace-pre-line">
-                  {expandedUpdate?.fullDescription || expandedUpdate?.shortDescription}
-                </p>
+                <div className="text-sm sm:text-base leading-relaxed text-zinc-300">
+  <span className="whitespace-pre-line">
+    {expandedUpdate?.fullDescription || expandedUpdate?.shortDescription}
+  </span>
+
+  {expandedUpdate.event && expandedUpdate.event.id && (
+    <span className="ml-4 inline-flex float-right align-baseline">
+      <button
+        onClick={() => handleEventRegistration(expandedUpdate.event)}
+        className="px-9 py-1.5 rounded-lg bg-emerald-600 text-white text-base font-medium hover:bg-emerald-500 transition-colors"
+      >
+        Register
+      </button>
+    </span>
+  )}
+</div>
+
               </div>
             </motion.div>
           </motion.div>

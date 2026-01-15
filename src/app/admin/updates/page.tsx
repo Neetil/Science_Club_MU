@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Update } from "@/lib/data";
+import { Update, Event } from "@/lib/data";
 
 export default function UpdatesPage() {
   const [updates, setUpdates] = useState<Update[]>([]);
@@ -140,9 +140,51 @@ function UpdateForm({
     title: update?.title || "",
     shortDescription: update?.shortDescription || "",
     fullDescription: update?.fullDescription || "",
+    eventId: (update as any)?.eventId || (update as any)?.event?.id || "",
     published: update?.published ?? false,
   });
   const [loading, setLoading] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  // Fetch events when form opens
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch("/api/admin/events");
+        if (res.ok) {
+          const data = await res.json();
+          // Only show upcoming events for linking
+          setEvents(data.filter((e: Event) => e.eventType === "upcoming"));
+        }
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  // Update form data when update prop changes
+  useEffect(() => {
+    if (update) {
+      setFormData({
+        date: update.date || "",
+        title: update.title || "",
+        shortDescription: update.shortDescription || "",
+        fullDescription: update.fullDescription || "",
+        eventId: (update as any)?.eventId || (update as any)?.event?.id || "",
+        published: update.published ?? false,
+      });
+    } else {
+      setFormData({
+        date: "",
+        title: "",
+        shortDescription: "",
+        fullDescription: "",
+        eventId: "",
+        published: false,
+      });
+    }
+  }, [update]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +193,9 @@ function UpdateForm({
     try {
       const url = "/api/admin/updates";
       const method = update ? "PUT" : "POST";
-      const body = update ? { ...formData, id: update.id } : formData;
+      const body = update 
+        ? { ...formData, id: update.id, eventId: formData.eventId || null } 
+        : { ...formData, eventId: formData.eventId || null };
 
       const res = await fetch(url, {
         method,
@@ -236,6 +280,27 @@ function UpdateForm({
               onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
               className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              Link to Event (Optional)
+            </label>
+            <select
+              value={formData.eventId}
+              onChange={(e) => setFormData({ ...formData, eventId: e.target.value })}
+              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
+            >
+              <option value="">No event link</option>
+              {events.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {event.title}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-zinc-400 mt-1">
+              Linking to an event will show a "Register" button on the homepage update card
+            </p>
           </div>
 
           <div className="flex items-center gap-2">

@@ -299,7 +299,11 @@ export default function GalleryPage() {
               {/* Content Overlay with Slide Animation */}
               <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 sm:p-12 pb-10 sm:pb-14 text-white">
                 <div className="max-w-2xl transform transition-all duration-700 group-hover:translate-y-0 hidden md:block">
-                  {currentFeatured ? (
+                  {isLoading ? (
+                    <div className="animate-slide-up-fade">
+                      <p className="text-lg text-indigo-200">Loading images...</p>
+                    </div>
+                  ) : currentFeatured ? (
                     <div
                       key={featuredIndex}
                       className="animate-slide-up-fade"

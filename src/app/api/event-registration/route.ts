@@ -86,22 +86,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already registered for this event (by email)
-    const existingRegistration = await prisma.eventRegistration.findFirst({
-      where: {
-        eventId,
-        email,
-      },
-    });
-
-    if (existingRegistration) {
-      return NextResponse.json(
-        { error: "You have already registered for this event." },
-        { status: 400 },
-      );
-    }
-
-    // Create registration
+    // Create registration (unlimited registrations allowed)
     await prisma.eventRegistration.create({
       data: {
         eventId,
