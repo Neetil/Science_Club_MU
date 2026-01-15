@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
 
@@ -25,15 +25,49 @@ interface Statistics {
   outreachTrips: number;
 }
 
+// Helper function to check cache synchronously
+const getCachedData = () => {
+  const CACHE_KEY = "homepage_data";
+  const CACHE_DURATION = 2.5 * 60 * 1000; // 2.5 minutes in milliseconds
+  
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      
+      // If cache is still valid (less than 5 minutes old)
+      if (now - timestamp < CACHE_DURATION) {
+        return {
+          updates: data.updates.slice(0, 4),
+          statistics: data.statistics,
+          hasCache: true,
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Error reading cache:", error);
+  }
+  
+  return {
+    updates: [],
+    statistics: {
+      eventsConducted: 0,
+      activeMembers: 0,
+      outreachTrips: 0,
+    },
+    hasCache: false,
+  };
+};
+
 export default function Page() {
+  // Initialize with cached data if available
+  const cachedData = getCachedData();
+  const hasInitializedFromCache = useRef(cachedData.hasCache);
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
-  const [updates, setUpdates] = useState<Update[]>([]);
-  const [statistics, setStatistics] = useState<Statistics>({
-    eventsConducted: 0,
-    activeMembers: 0,
-    outreachTrips: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [updates, setUpdates] = useState<Update[]>(cachedData.updates);
+  const [statistics, setStatistics] = useState<Statistics>(cachedData.statistics);
+  const [loading, setLoading] = useState(!cachedData.hasCache);
   const [selectedEvent, setSelectedEvent] = useState<{
     id: string;
     title: string;
@@ -57,7 +91,58 @@ export default function Page() {
 
   const fetchData = useCallback(async () => {
     const CACHE_KEY = "homepage_data";
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const CACHE_DURATION = 2.5 * 60 * 1000; // 2.5 minutes in milliseconds
+
+    // If we already initialized from cache, just refresh silently in background
+    if (hasInitializedFromCache.current) {
+      // Just refresh cache silently in background without affecting UI
+      setTimeout(async () => {
+        try {
+          const [updatesRes, statsRes] = await Promise.all([
+            fetch("/api/updates"),
+            fetch("/api/statistics"),
+          ]);
+
+          let updatesData: Update[] = [];
+          let statsData: Statistics = {
+            eventsConducted: 0,
+            activeMembers: 0,
+            outreachTrips: 0,
+          };
+
+          if (updatesRes.ok) {
+            updatesData = await updatesRes.json();
+          }
+
+          if (statsRes.ok) {
+            statsData = await statsRes.json();
+          }
+
+          // Update cache and state silently
+          try {
+            localStorage.setItem(
+              CACHE_KEY,
+              JSON.stringify({
+                data: {
+                  updates: updatesData,
+                  statistics: statsData,
+                },
+                timestamp: Date.now(),
+              })
+            );
+            if (updatesData.length > 0) {
+              setUpdates(updatesData.slice(0, 4));
+              setStatistics(statsData);
+            }
+          } catch (error) {
+            console.error("Error saving cache:", error);
+          }
+        } catch (error) {
+          console.error("Failed to refresh cache:", error);
+        }
+      }, 1000);
+      return;
+    }
 
     const fetchFreshData = async (cacheKey: string) => {
       try {
@@ -105,35 +190,49 @@ export default function Page() {
       }
     };
 
-    // Check cache first
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        const now = Date.now();
-        
-        // If cache is still valid (less than 5 minutes old)
-        if (now - timestamp < CACHE_DURATION) {
-          // Use cached data immediately
-          setUpdates(data.updates.slice(0, 4));
-          setStatistics(data.statistics);
-          setLoading(false);
+    // Check cache first (only if we didn't already initialize from cache)
+    if (!hasInitializedFromCache.current) {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          const now = Date.now();
           
-          // Fetch fresh data in background to update cache
-          fetchFreshData(CACHE_KEY);
-          return;
+          // If cache is still valid (less than 5 minutes old)
+          if (now - timestamp < CACHE_DURATION) {
+            // Use cached data immediately
+            setUpdates(data.updates.slice(0, 4));
+            setStatistics(data.statistics);
+            setLoading(false);
+            
+            // Fetch fresh data in background to update cache (delayed to avoid blocking)
+            setTimeout(() => {
+              fetchFreshData(CACHE_KEY);
+            }, 100);
+            return;
+          }
         }
+      } catch (error) {
+        console.error("Error reading cache:", error);
       }
-    } catch (error) {
-      console.error("Error reading cache:", error);
-    }
 
-    // No valid cache, fetch normally
-    await fetchFreshData(CACHE_KEY);
+      // No valid cache, fetch normally
+      await fetchFreshData(CACHE_KEY);
+    }
   }, []);
 
   useEffect(() => {
-    fetchData();
+    // If we initialized from cache, skip fetchData entirely
+    // The cache will be refreshed silently in the background by fetchData
+    // But we need to call it to set up the background refresh
+    // However, fetchData will detect hasInitializedFromCache and skip
+    if (hasInitializedFromCache.current) {
+      // Just set up background refresh, don't do anything that affects loading
+      fetchData();
+    } else {
+      // No cache, fetch normally
+      fetchData();
+    }
   }, [fetchData]);
 
   const expandedUpdate =
@@ -234,7 +333,7 @@ export default function Page() {
         <h2 className="text-lg sm:text-xl font-semibold text-white px-1">Latest Updates</h2>
         <div className="flex flex-col md:flex-row md:items-stretch gap-6">
           <ul className="flex flex-col md:flex-[2] md:grid md:grid-cols-2 gap-4">
-            {loading ? (
+            {loading && updates.length === 0 ? (
               <>
                 {[...Array(4)].map((_, i) => (
                   <li key={i} className={i >= 2 ? "hidden md:block" : ""}>
@@ -276,7 +375,7 @@ export default function Page() {
           <aside className="rounded-xl border border-white/10 bg-white/[0.02] p-4 md:w-80 md:flex md:flex-col">
             <h3 className="text-base font-semibold text-white mb-4 text-center">Club Statistics</h3>
           <div className="space-y-4 md:flex-1 md:flex md:flex-col md:justify-between">
-            {loading ? (
+            {loading && updates.length === 0 ? (
               <>
                 <StatisticsSkeleton />
                 <StatisticsSkeleton />

@@ -4,6 +4,29 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+// Helper function to check cache synchronously
+const checkHomepageCache = () => {
+  const CACHE_KEY = "homepage_data";
+  const CACHE_DURATION = 2.5 * 60 * 1000; // 2.5 minutes in milliseconds
+  
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { timestamp } = JSON.parse(cached);
+      const now = Date.now();
+      
+      // If cache is still valid (less than 5 minutes old)
+      if (now - timestamp < CACHE_DURATION) {
+        return true;
+      }
+    }
+  } catch (error) {
+    // Ignore errors
+  }
+  
+  return false;
+};
+
 export function ClientBody({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +47,17 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Check if we have valid cached homepage data
+    const hasCache = checkHomepageCache();
+    
+    if (hasCache) {
+      // Skip loading screen if cache exists
+      setIsLoading(false);
+      setProgress(1);
+      return;
+    }
+
+    // No cache, show loading screen
     setIsLoading(true);
     setProgress(0);
 
@@ -31,7 +65,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setProgress(1);
       timerRef.current = null;
-    }, 6000);
+    }, 4000);
 
     return () => {
       if (timerRef.current !== null) {
@@ -53,7 +87,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading) return;
     
-    const DURATION = 6000; // 6 seconds
+    const DURATION = 4000; // 4 seconds
     const UPDATE_INTERVAL = 16; // ~60fps for smooth animation
     const STEPS = DURATION / UPDATE_INTERVAL; // ~375 steps
     const INCREMENT = 1 / STEPS; // Progress increment per step
