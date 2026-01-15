@@ -25,9 +25,28 @@ model Event {
   category    String
   eventType   EventType @default(upcoming)
   image       String?
+  isPaid      Boolean   @default(false)
+  qrCodeUrl   String?   // QR code image URL for payment
   published   Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  registrations EventRegistration[]
+  updates     Update[]
+}
+
+model EventRegistration {
+  id            String   @id @default(cuid())
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name          String
+  email         String
+  phone         String?
+  studentId     String?
+  year          String?
+  transactionId String?   // Transaction ID for paid events
+  additionalNotes String?
+  ip            String
+  createdAt     DateTime @default(now())
 }
 
 model GalleryImage {
@@ -78,6 +97,8 @@ model Update {
   title            String
   shortDescription String
   fullDescription  String
+  eventId          String?  // Link to event for registration
+  event            Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
   published        Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

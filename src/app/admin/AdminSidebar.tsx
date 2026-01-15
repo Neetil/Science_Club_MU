@@ -7,6 +7,7 @@ import { useState } from "react";
 const adminNavItems = [
   { label: "Dashboard", href: "/admin", icon: "📊" },
   { label: "Events", href: "/admin/events", icon: "📅" },
+  { label: "Event Registrations", href: "/admin/event-registrations", icon: "📝" },
   { label: "Gallery", href: "/admin/gallery", icon: "🖼️" },
   { label: "Hero Gallery", href: "/admin/hero-gallery", icon: "⭐" },
   { label: "Team", href: "/admin/team", icon: "👥" },

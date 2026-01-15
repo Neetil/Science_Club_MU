@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
+import type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
 
-export type { ContactSubmission, Event, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
+export type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -71,8 +71,9 @@ export async function deleteTeamMember(id: string) {
 }
 
 // Updates/News
-export async function getUpdates(): Promise<Update[]> {
+export async function getUpdates(): Promise<(Update & { event: Event | null })[]> {
   return prisma.update.findMany({
+    include: { event: true },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -148,5 +149,22 @@ export async function updateHeroGalleryImage(id: string, data: Partial<Omit<Hero
 
 export async function deleteHeroGalleryImage(id: string) {
   return prisma.heroGallery.delete({ where: { id } });
+}
+
+// Event Registrations
+export async function getEventRegistrations(eventId?: string): Promise<(EventRegistration & { event: Event })[]> {
+  return prisma.eventRegistration.findMany({
+    where: eventId ? { eventId } : undefined,
+    include: { event: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function createEventRegistration(data: Omit<EventRegistration, "id" | "createdAt">) {
+  return prisma.eventRegistration.create({ data });
+}
+
+export async function deleteEventRegistration(id: string) {
+  return prisma.eventRegistration.delete({ where: { id } });
 }
 

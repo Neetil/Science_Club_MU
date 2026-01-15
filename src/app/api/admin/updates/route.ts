@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       title: body.title,
       shortDescription: body.shortDescription,
       fullDescription: body.fullDescription,
+      eventId: body.eventId || null,
       published: body.published ?? false,
     });
 
@@ -44,6 +45,7 @@ export async function PUT(request: NextRequest) {
       title: body.title,
       shortDescription: body.shortDescription,
       fullDescription: body.fullDescription,
+      eventId: body.eventId,
       published: body.published,
     });
     return NextResponse.json(updated);
