@@ -10,12 +10,27 @@ interface Event {
   category: string;
   eventType: "upcoming" | "past";
   image?: string;
+  isPaid?: boolean;
+  qrCodeUrl?: string | null;
 }
 
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [registrationForm, setRegistrationForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    studentId: "",
+    year: "",
+    transactionId: "",
+    additionalNotes: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -37,6 +52,62 @@ export default function EventsPage() {
 
   const upcomingEvents = events.filter((e) => e.eventType === "upcoming");
   const pastEvents = events.filter((e) => e.eventType === "past");
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setShowRegistrationModal(true);
+    setSubmitMessage(null);
+    setRegistrationForm({
+      name: "",
+      email: "",
+      phone: "",
+      studentId: "",
+      year: "",
+      transactionId: "",
+      additionalNotes: "",
+    });
+  };
+
+  const handleRegistrationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent) return;
+
+    setSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const res = await fetch("/api/event-registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: selectedEvent.id,
+          name: registrationForm.name,
+          email: registrationForm.email,
+          phone: registrationForm.phone,
+          studentId: registrationForm.studentId,
+          year: registrationForm.year,
+          transactionId: selectedEvent.isPaid ? registrationForm.transactionId : undefined,
+          additionalNotes: registrationForm.additionalNotes,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSubmitMessage({ type: "success", text: data.message || "Registration successful!" });
+        setTimeout(() => {
+          setShowRegistrationModal(false);
+          setSelectedEvent(null);
+        }, 2000);
+      } else {
+        setSubmitMessage({ type: "error", text: data.error || "Failed to register. Please try again." });
+      }
+    } catch (error) {
+      setSubmitMessage({ type: "error", text: "Something went wrong. Please try again later." });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-20">
@@ -119,27 +190,6 @@ export default function EventsPage() {
                 </p>
               </div>
 
-              {/* Search and Filters - Advanced */}
-              <div className="max-w-7xl mx-auto">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search events..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-6 py-4 pl-14 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 backdrop-blur-sm text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
-                  />
-                  <svg
-                    className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-
               {loading ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {[...Array(6)].map((_, i) => (
@@ -148,20 +198,11 @@ export default function EventsPage() {
                 </div>
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {upcomingEvents
-                    .filter((event) => {
-                      if (!searchQuery.trim()) return true;
-                      const query = searchQuery.toLowerCase();
-                      return (
-                        event.title.toLowerCase().includes(query) ||
-                        event.description.toLowerCase().includes(query) ||
-                        event.category.toLowerCase().includes(query)
-                      );
-                    })
-                    .map((event) => (
-                      <div
+                  {upcomingEvents.map((event) => (
+                      <button
                         key={event.id}
-                        className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-teal-950/10 p-6 transition-all hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-900/20 hover:-translate-y-1"
+                        onClick={() => handleEventClick(event)}
+                        className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-teal-950/10 p-6 transition-all hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-900/20 hover:-translate-y-1 cursor-pointer text-left"
                       >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition" />
                         <div className="relative space-y-4">
@@ -174,8 +215,16 @@ export default function EventsPage() {
                             </div>
                           </div>
                           <p className="text-sm text-zinc-300 leading-relaxed">{event.description}</p>
+                          <div className="pt-2">
+                            <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                              Register Now
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                 </div>
               )}
@@ -244,6 +293,196 @@ export default function EventsPage() {
             )}
           </div>
         </section>
+      )}
+
+      {/* Registration Modal */}
+      {showRegistrationModal && selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-teal-950/30 to-cyan-950/40 backdrop-blur-sm p-8">
+            <button
+              onClick={() => {
+                setShowRegistrationModal(false);
+                setSelectedEvent(null);
+                setSubmitMessage(null);
+              }}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-2">Register for Event</h2>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-emerald-300">{selectedEvent.title}</h3>
+                  <p className="text-sm text-zinc-400">{selectedEvent.description}</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleRegistrationSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    required
+                    value={registrationForm.name}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, name: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Email <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    required
+                    value={registrationForm.email}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      value={registrationForm.phone}
+                      onChange={(e) => setRegistrationForm({ ...registrationForm, phone: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="studentId" className="block text-sm font-medium text-zinc-300 mb-2">
+                      Student ID / Roll Number
+                    </label>
+                    <input
+                      type="text"
+                      id="studentId"
+                      value={registrationForm.studentId}
+                      onChange={(e) => setRegistrationForm({ ...registrationForm, studentId: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                      placeholder="Enter your student ID"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="year" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Year / Semester
+                  </label>
+                  <input
+                    type="text"
+                    id="year"
+                    value={registrationForm.year}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, year: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                    placeholder="e.g., 2nd Year, 3rd Semester"
+                  />
+                </div>
+
+                {selectedEvent.isPaid && (
+                  <div className="space-y-4 p-4 rounded-lg border border-emerald-500/30 bg-emerald-950/20">
+                    <div>
+                      <label className="block text-sm font-medium text-emerald-300 mb-2">
+                        Payment Required
+                      </label>
+                      <p className="text-xs text-zinc-400 mb-4">
+                        This is a paid event. Please complete the payment using the QR code below and enter your transaction ID.
+                      </p>
+                      {selectedEvent.qrCodeUrl && (
+                        <div className="flex justify-center mb-4">
+                          <img
+                            src={selectedEvent.qrCodeUrl}
+                            alt="Payment QR Code"
+                            className="max-w-xs w-full rounded-lg border border-emerald-500/30"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="transactionId" className="block text-sm font-medium text-zinc-300 mb-2">
+                        Transaction ID <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="transactionId"
+                        required={selectedEvent.isPaid}
+                        value={registrationForm.transactionId}
+                        onChange={(e) => setRegistrationForm({ ...registrationForm, transactionId: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                        placeholder="Enter your payment transaction ID"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="additionalNotes" className="block text-sm font-medium text-zinc-300 mb-2">
+                    Additional Notes (Optional)
+                  </label>
+                  <textarea
+                    id="additionalNotes"
+                    rows={3}
+                    value={registrationForm.additionalNotes}
+                    onChange={(e) => setRegistrationForm({ ...registrationForm, additionalNotes: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all resize-none"
+                    placeholder="Any additional information you'd like to share..."
+                  />
+                </div>
+
+                {submitMessage && (
+                  <div
+                    className={`p-4 rounded-lg ${
+                      submitMessage.type === "success"
+                        ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"
+                        : "bg-red-500/20 border border-red-500/30 text-red-300"
+                    }`}
+                  >
+                    {submitMessage.text}
+                  </div>
+                )}
+
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRegistrationModal(false);
+                      setSelectedEvent(null);
+                      setSubmitMessage(null);
+                    }}
+                    className="flex-1 px-6 py-3 rounded-lg border border-zinc-500/30 bg-zinc-900/20 text-zinc-300 hover:bg-zinc-800/30 transition-colors"
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium hover:from-emerald-500 hover:to-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? "Registering..." : "Register"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

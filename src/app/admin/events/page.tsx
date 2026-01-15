@@ -245,6 +245,8 @@ function EventForm({
     category: event?.category || "",
     eventType: (event?.eventType as "upcoming" | "past") || "upcoming",
     published: event?.published ?? false,
+    isPaid: event?.isPaid ?? false,
+    qrCodeUrl: event?.qrCodeUrl || "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -365,6 +367,37 @@ function EventForm({
               Publish immediately
             </label>
           </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isPaid"
+              checked={formData.isPaid}
+              onChange={(e) => setFormData({ ...formData, isPaid: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <label htmlFor="isPaid" className="text-sm text-zinc-300">
+              Paid Event
+            </label>
+          </div>
+
+          {formData.isPaid && (
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-2">
+                QR Code URL (Payment)
+              </label>
+              <input
+                type="url"
+                value={formData.qrCodeUrl}
+                onChange={(e) => setFormData({ ...formData, qrCodeUrl: e.target.value })}
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white"
+                placeholder="https://example.com/qr-code.png"
+              />
+              <p className="text-xs text-zinc-400 mt-1">
+                Upload your QR code image to Cloudflare R2 and paste the URL here
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4">
             <button

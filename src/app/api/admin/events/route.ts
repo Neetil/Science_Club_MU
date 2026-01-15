@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
       category: body.category,
       eventType: body.eventType || "upcoming",
       image: null,
+      isPaid: body.isPaid ?? false,
+      qrCodeUrl: body.qrCodeUrl || null,
       published: body.published ?? false,
     });
 
@@ -45,6 +47,8 @@ export async function PUT(request: NextRequest) {
       description: body.description,
       category: body.category,
       eventType: body.eventType,
+      isPaid: body.isPaid,
+      qrCodeUrl: body.qrCodeUrl,
       published: body.published,
     });
     return NextResponse.json(updated);
