@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Event } from "@/lib/data";
 import * as XLSX from "xlsx";
 
@@ -26,13 +26,31 @@ export default function EventRegistrationsPage() {
   const [selectedRegistration, setSelectedRegistration] = useState<EventRegistration | null>(null);
   const [filterEventId, setFilterEventId] = useState<string>("all");
 
+  const fetchRegistrations = useCallback(async () => {
+    try {
+      const url = filterEventId === "all" 
+        ? "/api/admin/event-registrations"
+        : `/api/admin/event-registrations?eventId=${filterEventId}`;
+      
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setRegistrations(data.sort((a: EventRegistration, b: EventRegistration) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ));
+      }
+    } catch (error) {
+      console.error("Failed to fetch registrations:", error);
+    }
+  }, [filterEventId]);
+
   useEffect(() => {
     fetchData();
   }, []);
 
   useEffect(() => {
     fetchRegistrations();
-  }, [filterEventId]);
+  }, [fetchRegistrations]);
 
   const fetchData = async () => {
     try {
@@ -56,24 +74,6 @@ export default function EventRegistrationsPage() {
       console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchRegistrations = async () => {
-    try {
-      const url = filterEventId === "all" 
-        ? "/api/admin/event-registrations"
-        : `/api/admin/event-registrations?eventId=${filterEventId}`;
-      
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setRegistrations(data.sort((a: EventRegistration, b: EventRegistration) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ));
-      }
-    } catch (error) {
-      console.error("Failed to fetch registrations:", error);
     }
   };
 

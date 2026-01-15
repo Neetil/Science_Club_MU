@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Update, Event } from "@/lib/data";
 
+type UpdateWithEvent = Update & { event?: Event | null };
+
 export default function UpdatesPage() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,7 +142,7 @@ function UpdateForm({
     title: update?.title || "",
     shortDescription: update?.shortDescription || "",
     fullDescription: update?.fullDescription || "",
-    eventId: (update as any)?.eventId || (update as any)?.event?.id || "",
+    eventId: (update as UpdateWithEvent)?.eventId || (update as UpdateWithEvent)?.event?.id || "",
     published: update?.published ?? false,
   });
   const [loading, setLoading] = useState(false);
@@ -171,7 +173,7 @@ function UpdateForm({
         title: update.title || "",
         shortDescription: update.shortDescription || "",
         fullDescription: update.fullDescription || "",
-        eventId: (update as any)?.eventId || (update as any)?.event?.id || "",
+        eventId: (update as UpdateWithEvent)?.eventId || (update as UpdateWithEvent)?.event?.id || "",
         published: update.published ?? false,
       });
     } else {
