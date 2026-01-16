@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/data";
 
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const RATE_LIMIT_MAX_REQUESTS = 5;
-
-declare global {
-  var eventRegistrationRateLimitStore: Map<string, { count: number; expiresAt: number }>;
-}
-
-const rateLimitStore =
-  globalThis.eventRegistrationRateLimitStore ?? new Map<string, { count: number; expiresAt: number }>();
-globalThis.eventRegistrationRateLimitStore = rateLimitStore;
-
 export async function POST(request: NextRequest) {
   try {
     const ip =
@@ -19,33 +8,13 @@ export async function POST(request: NextRequest) {
       request.headers.get("x-real-ip")?.trim() ||
       "unknown";
 
-    const now = Date.now();
-    const rateEntry = rateLimitStore.get(ip);
-
-    if (rateEntry && rateEntry.expiresAt > now) {
-      if (rateEntry.count >= RATE_LIMIT_MAX_REQUESTS) {
-        return NextResponse.json(
-          {
-            error: "Too many requests. Please wait a few minutes before trying again.",
-          },
-          { status: 429 },
-        );
-      }
-      rateEntry.count += 1;
-      rateLimitStore.set(ip, rateEntry);
-    } else {
-      rateLimitStore.set(ip, {
-        count: 1,
-        expiresAt: now + RATE_LIMIT_WINDOW_MS,
-      });
-    }
-
     const body = await request.json();
     const { eventId, name, email, phone, studentId, year, transactionId, additionalNotes } = body;
 
-    if (!eventId || !name || !email) {
+    // Validate all required fields
+    if (!eventId || !name || !email || !phone || !studentId || !year) {
       return NextResponse.json(
-        { error: "Event ID, name, and email are required." },
+        { error: "Event ID, name, email, phone, student ID, and year are required." },
         { status: 400 },
       );
     }
@@ -92,9 +61,9 @@ export async function POST(request: NextRequest) {
         eventId,
         name,
         email,
-        phone: phone || null,
-        studentId: studentId || null,
-        year: year || null,
+        phone,
+        studentId,
+        year,
         transactionId: transactionId || null,
         additionalNotes: additionalNotes || null,
         ip,
