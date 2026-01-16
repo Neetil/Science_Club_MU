@@ -403,7 +403,7 @@ export default function EventsPage() {
                         Payment Required
                       </label>
                       <p className="text-xs text-zinc-400 mb-4">
-                        This is a paid event. Please complete the payment using the QR code below and enter your transaction ID.
+                        This is a paid event. Please complete the payment of 100 Rs using the QR code below and enter your transaction ID.
                       </p>
                       {selectedEvent.qrCodeUrl && (
                         <div className="flex justify-center mb-4">
