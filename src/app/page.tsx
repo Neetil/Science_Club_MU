@@ -589,11 +589,12 @@ export default function Page() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-2">
-                      Phone Number
+                      Phone Number <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="tel"
                       id="phone"
+                      required
                       value={registrationForm.phone}
                       onChange={(e) => setRegistrationForm({ ...registrationForm, phone: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
@@ -603,11 +604,12 @@ export default function Page() {
 
                   <div>
                     <label htmlFor="studentId" className="block text-sm font-medium text-zinc-300 mb-2">
-                      Student ID / Roll Number
+                      Student ID / Roll Number <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="text"
                       id="studentId"
+                      required
                       value={registrationForm.studentId}
                       onChange={(e) => setRegistrationForm({ ...registrationForm, studentId: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
@@ -618,11 +620,12 @@ export default function Page() {
 
                 <div>
                   <label htmlFor="year" className="block text-sm font-medium text-zinc-300 mb-2">
-                    Year / Semester
+                    Year / Semester <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     id="year"
+                    required
                     value={registrationForm.year}
                     onChange={(e) => setRegistrationForm({ ...registrationForm, year: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all"
@@ -678,6 +681,13 @@ export default function Page() {
                     className="w-full px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/30 transition-all resize-none"
                     placeholder="Any additional information you'd like to share..."
                   />
+                  <p className="mt-2 text-sm text-zinc-400">
+                    If you find any problem in registering the event, please contact us through{" "}
+                    <a href="/contact" className="text-emerald-400 hover:text-emerald-300 underline">
+                      contact page
+                    </a>
+                    .
+                  </p>
                 </div>
 
                 {submitMessage && (
