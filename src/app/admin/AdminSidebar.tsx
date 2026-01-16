@@ -21,6 +21,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -36,50 +37,66 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-black/30 border-r border-white/10 min-h-screen p-4">
-      <div className="mb-8">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">Admin Panel</span>
-        </Link>
-        <p className="text-xs text-zinc-400 mt-1">Physics & Astronomy Club</p>
+    <aside className="w-full md:w-64 bg-black/30 border-b md:border-b-0 md:border-r border-white/10 md:min-h-screen">
+      {/* Top bar / header */}
+      <div className="flex items-center justify-between p-4 border-b border-white/10 md:border-b-0 md:block md:p-4">
+        <div className="flex items-center gap-2">
+          <Link href="/admin" className="flex items-center gap-2">
+            <span className="text-xl font-bold text-white">Admin Panel</span>
+          </Link>
+        </div>
+        <p className="hidden md:block text-xs text-zinc-400 mt-1">Physics & Astronomy Club</p>
+
+        {/* Mobile menu toggle */}
+        <button
+          type="button"
+          className="md:hidden inline-flex items-center justify-center rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-200 hover:bg-white/5"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          {isOpen ? "Close" : "Menu"}
+        </button>
       </div>
 
-      <nav className="space-y-2">
-        {adminNavItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                isActive
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
-                  : "text-zinc-300 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span className="text-sm font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Navigation */}
+      <div className={`${isOpen ? "block" : "hidden"} md:block`}>
+        <nav className="space-y-1 px-2 pb-4 pt-2 md:px-4 md:pt-4">
+          {adminNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  isActive
+                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                    : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      <div className="mt-8 pt-8 border-t border-white/10">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg text-zinc-300 hover:bg-white/5 hover:text-white transition-colors mb-2"
-        >
-          <span className="text-lg">🏠</span>
-          <span className="text-sm font-medium">View Site</span>
-        </Link>
-        <button
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-        >
-          <span className="text-lg">🚪</span>
-          <span className="text-sm font-medium">{loggingOut ? "Logging out..." : "Logout"}</span>
-        </button>
+        {/* Footer actions */}
+        <div className="mt-4 md:mt-8 pt-4 md:pt-8 border-t border-white/10 px-2 md:px-4 pb-4">
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors mb-2"
+          >
+            <span className="text-lg">🏠</span>
+            <span className="font-medium">View Site</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+          >
+            <span className="text-lg">🚪</span>
+            <span className="font-medium">{loggingOut ? "Logging out..." : "Logout"}</span>
+          </button>
+        </div>
       </div>
     </aside>
   );

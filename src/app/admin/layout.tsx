@@ -18,9 +18,9 @@ export default async function AdminLayout({
   // Authentication is handled by middleware, so we don't need to check here
   return (
     <div className="min-h-screen bg-[#0a0d14]">
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <AdminSidebar />
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-4 sm:p-5 md:p-8">
           {children}
         </main>
       </div>
