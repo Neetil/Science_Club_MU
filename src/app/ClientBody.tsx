@@ -65,7 +65,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setProgress(1);
       timerRef.current = null;
-    }, 4000);
+    }, 3000);
 
     return () => {
       if (timerRef.current !== null) {
@@ -87,7 +87,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading) return;
     
-    const DURATION = 4000; // 4 seconds
+    const DURATION = 3000; // 3 seconds
     const UPDATE_INTERVAL = 16; // ~60fps for smooth animation
     const STEPS = DURATION / UPDATE_INTERVAL; // ~375 steps
     const INCREMENT = 1 / STEPS; // Progress increment per step
