@@ -130,6 +130,19 @@
     animation: blink-status 0.85s ease-in-out infinite;
   }
 
+  @keyframes blink-button {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-blink-button {
+    animation: blink-button 1.5s ease-in-out infinite;
+  }
+
   @keyframes fadeInScale {
     from {
       opacity: 0;

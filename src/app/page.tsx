@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
+import { useToast } from "@/components/ToastProvider";
 
 interface Update {
   id: string;
@@ -61,9 +62,11 @@ const getCachedData = () => {
 };
 
 export default function Page() {
+  const { showToast } = useToast();
   // Initialize with cached data if available
   const cachedData = getCachedData();
   const hasInitializedFromCache = useRef(cachedData.hasCache);
+  const toastShownRef = useRef(false);
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
   const [updates, setUpdates] = useState<Update[]>(cachedData.updates);
   const [statistics, setStatistics] = useState<Statistics>(cachedData.statistics);
@@ -235,6 +238,65 @@ export default function Page() {
     }
   }, [fetchData]);
 
+  // Show toast notification for "Picture Abhi Baki Hai !" event registration
+  useEffect(() => {
+    if (toastShownRef.current) return;
+    
+    const CACHE_KEY = "homepage_data";
+    const CACHE_DURATION = 2.5 * 60 * 1000; // 2.5 minutes in milliseconds
+    const TOAST_KEY = "registration_toast_shown";
+    const targetEventTitle = "Picture Abhi Baki Hai !";
+    
+    // Check if we've already shown the toast in this session
+    try {
+      const toastShown = sessionStorage.getItem(TOAST_KEY);
+      if (toastShown) {
+        toastShownRef.current = true;
+        return;
+      }
+      
+      // Function to check if target event exists
+      const checkForTargetEvent = (updatesToCheck: Update[]) => {
+        return updatesToCheck.some((update) => 
+          update.event?.title === targetEventTitle || 
+          update.event?.title?.includes(targetEventTitle)
+        );
+      };
+      
+      // Check if we have valid cache (within 2.5 minutes)
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const now = Date.now();
+        
+        if (now - timestamp < CACHE_DURATION) {
+          // Check cached updates
+          if (data.updates && checkForTargetEvent(data.updates)) {
+            setTimeout(() => {
+              showToast(`Registrations are live for "${targetEventTitle}"`, "info");
+              sessionStorage.setItem(TOAST_KEY, "true");
+              toastShownRef.current = true;
+            }, 1500);
+            return;
+          }
+        }
+      }
+      
+      // Also check current updates state (in case cache doesn't have it or updates are fresh)
+      if (!loading && updates.length > 0) {
+        if (checkForTargetEvent(updates)) {
+          setTimeout(() => {
+            showToast(`Registrations are live for "${targetEventTitle}"`, "info");
+            sessionStorage.setItem(TOAST_KEY, "true");
+            toastShownRef.current = true;
+          }, 1500);
+        }
+      }
+    } catch (error) {
+      console.error("Error showing registration toast:", error);
+    }
+  }, [updates, loading, showToast]);
+
   const expandedUpdate =
     expandedPanel !== null ? updates.find((u) => u.id === expandedPanel) ?? null : null;
 
@@ -362,7 +424,7 @@ export default function Page() {
                   {update.event && update.event.id && (
                     <button
                       onClick={() => handleEventRegistration(update.event)}
-                      className="absolute bottom-4 right-4 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-500 transition-colors"
+                      className="absolute bottom-4 right-4 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-500 transition-colors animate-blink-button"
                     >
                       Register
                     </button>
