@@ -18,23 +18,23 @@ export const instagramPosts: InstagramPost[] = [
   },
   {
     id: "2",
-    imageUrl: "https://via.placeholder.com/400x400?text=Instagram+Post+2",
-    caption: "Night sky observation session was incredible! 🌟",
-    instagramUrl: "https://www.instagram.com/p/your-post-id-2/",
+    imageUrl: "/Ocean.png",
+    caption: "Cosmic eyes. ✨",
+    instagramUrl: "https://www.instagram.com/reel/DPbK4NTkRNf/",
    
   },
   {
     id: "3",
-    imageUrl: "https://via.placeholder.com/400x400?text=Instagram+Post+3",
-    caption: "Workshop highlights - Learning together!",
-    instagramUrl: "https://www.instagram.com/p/your-post-id-3/",
+    imageUrl: "/Recap.png",
+    caption: "Memory Lane of Science Club, team of 2024-25 ❤️✨🥹",
+    instagramUrl: "https://www.instagram.com/reel/DMfa-JptjnH/",
     
   },
   {
     id: "4",
-    imageUrl: "https://via.placeholder.com/400x400?text=Instagram+Post+4",
-    caption: "New members welcome event 🎉",
-    instagramUrl: "https://www.instagram.com/p/your-post-id-4/",
+    imageUrl: "/Picture.jpeg",
+    caption: "Bollywood runs in your veins! ❤️🎬",
+    instagramUrl: "https://www.instagram.com/reel/DUGisD7DQw2/",
     
   },
 ];
