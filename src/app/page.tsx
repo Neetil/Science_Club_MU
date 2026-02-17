@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
 import { useToast } from "@/components/ToastProvider";
+import { InstagramFeed } from "@/components/InstagramFeed";
+import { getInstagramPosts } from "@/lib/social";
 
 interface Update {
   id: string;
@@ -563,6 +565,11 @@ export default function Page() {
             )}
           </form>
         </div>
+      </section>
+
+      {/* Instagram Feed */}
+      <section className="space-y-4">
+        <InstagramFeed posts={getInstagramPosts()} />
       </section>
 
       {/* Expanded update modal with subtle spring animation */}
