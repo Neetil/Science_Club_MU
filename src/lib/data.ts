@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
+import type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User, Subscriber } from "@prisma/client";
 
-export type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User } from "@prisma/client";
+export type { ContactSubmission, Event, EventRegistration, GalleryImage, HeroGallery, Statistics, TeamMember, Update, User, Subscriber } from "@prisma/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -166,5 +166,20 @@ export async function createEventRegistration(data: Omit<EventRegistration, "id"
 
 export async function deleteEventRegistration(id: string) {
   return prisma.eventRegistration.delete({ where: { id } });
+}
+
+// Newsletter Subscribers
+export async function getSubscribers(): Promise<Subscriber[]> {
+  return prisma.subscriber.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function createSubscriber(data: Omit<Subscriber, "id" | "createdAt">) {
+  return prisma.subscriber.create({ data });
+}
+
+export async function deleteSubscriber(id: string) {
+  return prisma.subscriber.delete({ where: { id } });
 }
 

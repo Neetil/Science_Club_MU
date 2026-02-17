@@ -91,6 +91,11 @@ export default function Page() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [newsletterMessage, setNewsletterMessage] = useState<{ type: "success" | "error"; text: string } | null>(
+    null,
+  );
 
   const fetchData = useCallback(async () => {
     const CACHE_KEY = "homepage_data";
@@ -365,6 +370,55 @@ export default function Page() {
     }
   };
 
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNewsletterMessage(null);
+
+    const email = newsletterEmail.trim();
+    if (!email) {
+      setNewsletterMessage({ type: "error", text: "Please enter your email address." });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setNewsletterMessage({ type: "error", text: "Please enter a valid email address." });
+      return;
+    }
+
+    setNewsletterSubmitting(true);
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setNewsletterMessage({
+          type: "success",
+          text: data.message || "You have been subscribed to event updates.",
+        });
+        setNewsletterEmail("");
+      } else {
+        setNewsletterMessage({
+          type: "error",
+          text: data.error || "Failed to subscribe. Please try again.",
+        });
+      }
+    } catch (error) {
+      setNewsletterMessage({
+        type: "error",
+        text: "Something went wrong. Please try again later.",
+      });
+    } finally {
+      setNewsletterSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-8 sm:space-y-12 md:space-y-16 pb-8">
       {/* Hero */}
@@ -467,6 +521,47 @@ export default function Page() {
             )}
           </div>
         </aside>
+        </div>
+      </section>
+
+      {/* Newsletter signup */}
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-6">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+          <div className="flex-1">
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Get latest updates by email</h2>
+            <p className="mt-1 text-sm text-zinc-400 max-w-prose">
+              Subscribe to be notified about upcoming events, competitions, and important announcements from the
+              Physics & Astronomy Club.
+            </p>
+          </div>
+          <form onSubmit={handleNewsletterSubmit} className="w-full md:w-auto md:min-w-[320px] space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-2.5 rounded-lg border border-white/15 bg-black/40 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-500/40 transition-all"
+                required
+              />
+              <button
+                type="submit"
+                disabled={newsletterSubmitting}
+                className="px-4 py-2.5 rounded-lg bg-cyan-600 text-sm font-medium text-white hover:bg-cyan-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {newsletterSubmitting ? "Subscribing..." : "Get updates"}
+              </button>
+            </div>
+            {newsletterMessage && (
+              <p
+                className={`text-xs ${
+                  newsletterMessage.type === "success" ? "text-emerald-300" : "text-red-300"
+                }`}
+              >
+                {newsletterMessage.text}
+              </p>
+            )}
+          </form>
         </div>
       </section>
 
