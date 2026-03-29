@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   ["Home", "/"],
-  ["About", "/about"],
   ["Events", "/events"],
   ["Gallery", "/gallery"],
   ["Team", "/team"],
+  ["About", "/about"],
   ["Contact", "/contact"],
 ];
 
@@ -137,6 +137,7 @@ export function Navigation() {
           onClick={() => setIsOpen(false)}
         />
       )}
+
     </header>
   );
 }

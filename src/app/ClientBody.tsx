@@ -85,6 +85,24 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
   }, [isLoading]);
 
   useEffect(() => {
+    const onHome = pathname === "/";
+    if (!onHome) return;
+
+    if (isLoading) {
+      document.body.dataset.homeReady = "false";
+      return;
+    }
+
+    // Delay slightly so the launch overlay has fully transitioned out.
+    const timer = window.setTimeout(() => {
+      document.body.dataset.homeReady = "true";
+      window.dispatchEvent(new Event("homepage-ready"));
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [isLoading, pathname]);
+
+  useEffect(() => {
     if (!isLoading) return;
     
     const DURATION = 3000; // 3 seconds
