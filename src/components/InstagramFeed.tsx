@@ -96,3 +96,4 @@ function InstagramPostCard({ post }: { post: InstagramPost }) {
   );
 }
 
+

@@ -69,6 +69,9 @@ export default function Page() {
   const cachedData = getCachedData();
   const hasInitializedFromCache = useRef(cachedData.hasCache);
   const toastShownRef = useRef(false);
+  const soundToastShownRef = useRef(false);
+  const shouldShowSoundToast = useRef(!cachedData.hasCache);
+  const [isHomepageReady, setIsHomepageReady] = useState(false);
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
   const [updates, setUpdates] = useState<Update[]>(cachedData.updates);
   const [statistics, setStatistics] = useState<Statistics>(cachedData.statistics);
@@ -244,6 +247,31 @@ export default function Page() {
       fetchData();
     }
   }, [fetchData]);
+
+  useEffect(() => {
+    if (document.body.dataset.homeReady === "true") {
+      setIsHomepageReady(true);
+      return;
+    }
+
+    const onHomepageReady = () => setIsHomepageReady(true);
+    window.addEventListener("homepage-ready", onHomepageReady);
+    return () => window.removeEventListener("homepage-ready", onHomepageReady);
+  }, []);
+
+  useEffect(() => {
+    if (loading || !isHomepageReady || soundToastShownRef.current) return;
+    if (!shouldShowSoundToast.current) return;
+
+    try {
+      setTimeout(() => {
+        showToast("Experience better with Sounds On.\nAccess it from the bottom right.", "cyan");
+        soundToastShownRef.current = true;
+      }, 300);
+    } catch (error) {
+      console.error("Error showing sound toast:", error);
+    }
+  }, [loading, isHomepageReady, showToast]);
 
   // Show toast notification for "Picture Abhi Baki Hai !" event registration
   useEffect(() => {
