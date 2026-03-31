@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# OAuth / credentials (never commit)
+*client_secret*.json
+*oauth*.json
+
