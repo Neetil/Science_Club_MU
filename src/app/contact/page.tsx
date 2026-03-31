@@ -12,6 +12,10 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isRatingSubmitting, setIsRatingSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,91 +51,182 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleRatingSubmit = async () => {
+    if (!rating) {
+      showToast("Please select a star rating first.", "error");
+      return;
+    }
+
+    setIsRatingSubmitting(true);
+    try {
+      const response = await fetch("/api/contact/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stars: rating,
+          message: feedbackMessage.trim(),
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        showToast(data.message || "Thanks for your feedback!", "success");
+        setRating(0);
+        setFeedbackMessage("");
+      } else {
+        showToast(data.error || "Could not send feedback right now.", "error");
+      }
+    } catch {
+      showToast("Could not send feedback right now.", "error");
+    } finally {
+      setIsRatingSubmitting(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-6xl space-y-12">
       {/* Unique Header - Split Design */}
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-        <div className="flex flex-col justify-center space-y-6 rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 via-violet-900/10 to-fuchsia-900/20 p-8 sm:p-12 backdrop-blur-sm">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-black text-white sm:text-5xl">Get in Touch</h1>
+        <div className="space-y-5">
+          <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-r from-slate-900/40 via-purple-900/20 to-violet-900/30 p-5 backdrop-blur-sm">
+            <p className="text-base font-semibold tracking-tight text-white">Rate your website experience</p>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+              Your quick feedback helps us improve your next visit.
+            </p>
+            <div
+              className="mt-3 flex items-center gap-1"
+              onMouseLeave={() => setHoverRating(0)}
+            >
+              {[1, 2, 3, 4, 5].map((star) => {
+                const filled = (hoverRating || rating) >= star;
+                return (
+                  <button
+                    key={star}
+                    type="button"
+                    onMouseEnter={() => setHoverRating(star)}
+                    onClick={() => setRating(star)}
+                    className="p-1"
+                    aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                  >
+                    <svg
+                      className={`h-6 w-6 transition-colors ${filled ? "text-yellow-300" : "text-zinc-500"}`}
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M11.48 3.5a.56.56 0 011.04 0l2.12 5.11a.56.56 0 00.47.34l5.52.44c.5.04.7.66.32 1l-4.2 3.6a.56.56 0 00-.18.56l1.28 5.39a.56.56 0 01-.84.61L12.2 17.6a.56.56 0 00-.6 0l-4.73 2.95a.56.56 0 01-.84-.61l1.28-5.39a.56.56 0 00-.18-.56l-4.2-3.6a.56.56 0 01.32-1l5.52-.44a.56.56 0 00.47-.34l2.12-5.11z" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <label htmlFor="feedback-note" className="mb-1 block text-xs font-medium text-purple-200">
+                Optional note
+              </label>
+              <textarea
+                id="feedback-note"
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                rows={2}
+                maxLength={300}
+                className="w-full rounded-lg border border-purple-500/30 bg-white/5 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-purple-400/60 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all resize-none"
+                placeholder="What can we improve?"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleRatingSubmit}
+              disabled={isRatingSubmitting}
+              className="mt-3 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:from-purple-500 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isRatingSubmitting ? "Sending..." : "Send"}
+            </button>
           </div>
-          <p className="text-lg leading-relaxed text-zinc-300">
-            Have questions about our events, want to collaborate, or just curious about the cosmos?
-            We're always listening. Send us a signal and we'll respond as soon as we're back in range.
-          </p>
-          <div className="space-y-4 pt-4">
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
-                <svg
-                  className="h-5 w-5 text-purple-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-purple-200">Email</p>
-                <a
-                  href="mailto:science.club@medicaps.ac.in"
-                  className="text-sm text-zinc-300 hover:text-purple-200 transition-colors"
-                >
-                  science.club@medicaps.ac.in
-                </a>
-              </div>
+
+          <div className="flex flex-col justify-center space-y-6 rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/20 via-violet-900/10 to-fuchsia-900/20 p-8 sm:p-12 backdrop-blur-sm">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-black text-white sm:text-5xl">Get in Touch</h1>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
-                <svg
-                  className="h-5 w-5 text-purple-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+            <p className="text-lg leading-relaxed text-zinc-300">
+              Have questions about our events, want to collaborate, or just curious about the cosmos?
+              We're always listening. Send us a signal and we'll respond as soon as we're back in range.
+            </p>
+            <div className="space-y-4 pt-4">
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
+                  <svg
+                    className="h-5 w-5 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-purple-200">Email</p>
+                  <a
+                    href="mailto:science.club@medicaps.ac.in"
+                    className="text-sm text-zinc-300 hover:text-purple-200 transition-colors"
+                  >
+                    science.club@medicaps.ac.in
+                  </a>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-purple-200">Location</p>
-                <p className="text-sm text-zinc-300">Medicaps University, Indore</p>
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
+                  <svg
+                    className="h-5 w-5 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-purple-200">Location</p>
+                  <p className="text-sm text-zinc-300">Medicaps University, Indore</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
-                <svg
-                  className="h-5 w-5 text-purple-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-purple-200">Response Time</p>
-                <p className="text-sm text-zinc-300">Usually within 24-48 hours</p>
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-400/30">
+                  <svg
+                    className="h-5 w-5 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-purple-200">Response Time</p>
+                  <p className="text-sm text-zinc-300">Usually within 24-48 hours</p>
+                </div>
               </div>
             </div>
           </div>
