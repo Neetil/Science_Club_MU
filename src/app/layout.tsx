@@ -5,6 +5,7 @@ import { ClientBody } from "./ClientBody";
 import { Navigation } from "./Navigation";
 import { ToastProvider } from "@/components/ToastProvider";
 import { MusicPlayer } from "@/components/MusicPlayer";
+import { AstraBotpress } from "@/components/AstraBotpress";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com";
 
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <canvas id="stars-canvas" className="absolute inset-0 opacity-30" />
             </div>
             <MusicPlayer />
+            <AstraBotpress />
             <Analytics />
           </ClientBody>
         </ToastProvider>

@@ -11,6 +11,17 @@ const rateLimitStore =
   globalThis.feedbackRateLimitStore ?? new Map<string, { count: number; expiresAt: number }>();
 globalThis.feedbackRateLimitStore = rateLimitStore;
 
+/** Skip Resend when testing locally so ratings don't email you during dev. */
+function shouldSkipFeedbackEmail(request: NextRequest): boolean {
+  if (process.env.NODE_ENV === "development") return true;
+  const host = (request.headers.get("host") ?? "").trim();
+  return (
+    /^localhost(?::\d+)?$/i.test(host) ||
+    /^127\.0\.0\.1(?::\d+)?$/.test(host) ||
+    /^\[::1\](?::\d+)?$/i.test(host)
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip =
@@ -45,10 +56,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Please provide a valid rating between 1 and 5." }, { status: 400 });
     }
 
-    try {
-      await sendFeedbackEmail(stars, message);
-    } catch (error) {
-      console.error("Feedback email failed (non-critical):", error);
+    if (!shouldSkipFeedbackEmail(request)) {
+      try {
+        await sendFeedbackEmail(stars, message);
+      } catch (error) {
+        console.error("Feedback email failed (non-critical):", error);
+      }
+    } else {
+      console.info(`[feedback] Skipping email (local/dev). Stars: ${stars}`, message || "");
     }
 
     return NextResponse.json({ success: true, message: "Thanks for rating your website experience!" }, { status: 200 });

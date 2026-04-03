@@ -15,6 +15,14 @@ export function MusicPlayer() {
   const [isMinimized, setIsMinimized] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("music-player:minimized", {
+        detail: { isMinimized },
+      }),
+    );
+  }, [isMinimized]);
+
   const playCurrentTrack = async () => {
     const audio = audioRef.current;
     if (!audio) return;
