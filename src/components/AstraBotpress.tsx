@@ -43,8 +43,8 @@ export function AstraBotpress() {
 
   return (
     <>
-      <Script src={INJECT_URL} strategy="afterInteractive" />
-      <Script src={WEBCHAT_BUNDLE_URL} strategy="afterInteractive" />
+      <Script src={INJECT_URL} strategy="lazyOnload" />
+      <Script src={WEBCHAT_BUNDLE_URL} strategy="lazyOnload" />
     </>
   );
 }

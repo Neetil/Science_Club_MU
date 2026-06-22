@@ -25,7 +25,7 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast("Login successful! Redirecting...", "success");
+        showToast("Login successful", "success");
         setTimeout(() => {
           router.push("/admin");
           router.refresh();
