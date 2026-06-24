@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { UpdateCardSkeleton, StatisticsSkeleton } from "@/components/Skeleton";
 import { useToast } from "@/components/ToastProvider";
 import { InstagramFeed } from "@/components/InstagramFeed";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { getInstagramPosts } from "@/lib/social";
 
 interface Update {
@@ -451,28 +452,8 @@ export default function Page() {
 
   return (
     <div className="space-y-8 sm:space-y-12 md:space-y-16 pb-8">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-cyan-500/10 to-transparent p-6 sm:p-8 md:p-12">
-        <div className="relative z-10 max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/80">Medicaps University</p>
-          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
-            Physics & Astronomy Club
-          </h1>
-          <p className="mt-4 text-sm sm:text-base max-w-prose text-zinc-300">
-            Exploring the cosmos through curiosity, discussions, experiments, collaboration and teamwork. Join us for expert talks, night sky observations, competitions, and hands-on research projects.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#updates" className="rounded-md bg-cyan-500/20 px-4 py-2 text-sm sm:text-base text-cyan-200 ring-1 ring-cyan-500/40 hover:bg-cyan-500/30 active:bg-cyan-500/40 transition-colors">See Updates</a>
-            <a href="/events" className="rounded-md bg-white/5 px-4 py-2 text-sm sm:text-base text-white ring-1 ring-white/10 hover:bg-white/10 active:bg-white/15 transition-colors">Upcoming Events</a>
-          </div>
-        </div>
-        {/* Animated particles (CSS-based waves) */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-sky-300/10 blur-3xl" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_40%_at_50%_120%,rgba(0,255,255,0.35),transparent)]" />
-        </div>
-      </section>
+      {/* Hero / Live Chat */}
+      <ChatWidget variant="hero" />
 
       {/* Updates Panel */}
       <section id="updates" className="space-y-4 scroll-mt-20">
