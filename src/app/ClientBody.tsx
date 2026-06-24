@@ -4,6 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+const LAUNCH_DURATION_MS = 1000;
+
+/** Set to true to re-enable the home page launch overlay. */
+const ENABLE_LAUNCH_OVERLAY = false;
+
 // Helper function to check cache synchronously
 const checkHomepageCache = () => {
   const CACHE_KEY = "homepage_data";
@@ -47,6 +52,12 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (!ENABLE_LAUNCH_OVERLAY) {
+      setIsLoading(false);
+      setProgress(1);
+      return;
+    }
+
     // Check if we have valid cached homepage data
     const hasCache = checkHomepageCache();
     
@@ -65,7 +76,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setProgress(1);
       timerRef.current = null;
-    }, 3000);
+    }, LAUNCH_DURATION_MS);
 
     return () => {
       if (timerRef.current !== null) {
@@ -105,7 +116,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading) return;
     
-    const DURATION = 3000; // 3 seconds
+    const DURATION = LAUNCH_DURATION_MS;
     const UPDATE_INTERVAL = 16; // ~60fps for smooth animation
     const STEPS = DURATION / UPDATE_INTERVAL; // ~375 steps
     const INCREMENT = 1 / STEPS; // Progress increment per step
@@ -193,7 +204,7 @@ export function ClientBody({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {isLoading && <LaunchOverlay progress={progress} />}
+      {ENABLE_LAUNCH_OVERLAY && isLoading && <LaunchOverlay progress={progress} />}
       <div
         className={cn(
           "relative transition-opacity duration-300 ease-out",
