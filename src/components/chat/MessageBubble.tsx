@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import type { ChatMessage } from "./types";
 
 interface MessageBubbleProps {
@@ -31,12 +30,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isSystem = message.senderType === "SYSTEM";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.25 }}
-      className={cn("flex w-full", isVisitor ? "justify-end" : "justify-start")}
-    >
+    <div className={cn("flex w-full", isVisitor ? "justify-end" : "justify-start")}>
       <div
         className={cn(
           "max-w-[85%] rounded-2xl px-4 py-3 shadow-sm",
@@ -58,6 +52,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           <p className="mt-2 text-[10px] text-zinc-500">{formatTime(message.createdAt)}</p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
