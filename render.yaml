@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: science-club-chat-server
+    env: node
+    plan: starter
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx tsx server/index.ts
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://scienceclub.neetil.in
+      - key: PORT
+        value: 5000
