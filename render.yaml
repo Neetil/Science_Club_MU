@@ -2,7 +2,7 @@ services:
   - type: web
     name: science-club-chat-server
     env: node
-    plan: starter
+    plan: free
     buildCommand: npm install && npx prisma generate
     startCommand: npx tsx server/index.ts
     healthCheckPath: /health
